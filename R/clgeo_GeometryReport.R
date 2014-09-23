@@ -16,7 +16,7 @@ clgeo_GeometryReport <- function(spgeom){
   },warning = function(w){
     clgeo_report$type <- "rgeos_validity"
     clgeo_report$valid <- FALSE
-    if(regexpr("self", conditionMessage(w), "match.length",
+    if(regexpr("at or near point", conditionMessage(w), "match.length",
                ignore.case = TRUE) > 1) clgeo_report$issue_type = "GEOM_VALIDITY"
     clgeo_report$warning_msg <- conditionMessage(w)
     return(clgeo_report)
