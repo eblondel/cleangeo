@@ -1,0 +1,9 @@
+import(sp)
+import(rgeos)
+
+export(
+ clgeo_GeometryReport,
+ clgeo_CollectionReport,
+ clgeo_SuspiciousFeatures,
+ clgeo_Clean
+)
