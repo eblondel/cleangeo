@@ -8,9 +8,9 @@ clgeo_Clean <- function(sp, errors.only = NULL){
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
-  
+
   fixed.sp <- SpatialPolygons(
-    lapply(1:length(sp), function(x){
+    Srl = lapply(1:length(sp), function(x){
       feature <- sp@polygons[[x]]
       if(!all(is.na(nv))){
         if(x %in% nv){          
@@ -28,16 +28,24 @@ clgeo_Clean <- function(sp, errors.only = NULL){
               slot(feature, "Polygons") <- slt
             }
           }
-          
-          #test clean geometry validity - NOT TESTED
-          #if(is.null(errors.only) & !as(report[x,]$valid, "logical")){
-          #  feature <- gBuffer(feature, byid = TRUE, width = 0)
-          #}
+           
+          #test clean geometry validity
+          if(is.null(errors.only) & !as(report[x,]$valid, "logical")){
+            feature <- SpatialPolygons(Srl = list(feature), pO = 1L,
+                                       proj4string = CRS(proj4string(sp)))
+            if(removedHoles > 0){
+              slot(feature, "polygons") <- lapply(slot(feature, "polygons"),
+                                                  checkPolygonsHoles)
+            }
+            
+            feature <- gBuffer(feature, width = 0)
+          }
         }
       }
       return(feature)
     }),
-    1:length(sp)
+    pO = 1:length(sp),
+    proj4string = CRS(proj4string(sp))
   )
   
   if(class(sp) == "SpatialPolygonsDataFrame"){
