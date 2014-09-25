@@ -7,7 +7,8 @@ clgeo_CollectionReport <- function(sp){
   
   clgeo_report <- as.data.frame(do.call("rbind", lapply(1:length(sp), function(x){
     report <- unlist(clgeo_GeometryReport(sp[x,]))
-  })), stringAsFactors = FALSE)
+  })), stringsAsFactors = FALSE)
+  clgeo_report$valid <- as(clgeo_report$valid, "logical")
   
   return(clgeo_report)
 }
