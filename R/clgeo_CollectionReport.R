@@ -9,6 +9,7 @@ clgeo_CollectionReport <- function(sp){
     report <- unlist(clgeo_GeometryReport(sp[x,]))
   })), stringsAsFactors = FALSE)
   clgeo_report$valid <- as(clgeo_report$valid, "logical")
-  
+  clgeo_report$type <- as.factor(clgeo_report$type)
+  clgeo_report$issue_type <- as.factor(clgeo_report$issue_type)
   return(clgeo_report)
 }
