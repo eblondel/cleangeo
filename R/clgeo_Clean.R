@@ -3,7 +3,30 @@
 # Author: Emmanuel Blondel <emmanuel.blondel1 at gmail.com>
 # Created: 2014-09-23
 #
-
+#' @title clgeo_Clean
+#' 
+#' @description
+#' Function to clean a spatial data collection 
+#'
+#' @author
+#' Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#'
+#' @param sp object extending the \code{\link[sp]{Spatial-class}}
+#' as defined in \pkg{sp}
+#' @param errors.only an object of class \code{vector} giving the types of errors
+#' for which the output should bounded. Default value is NULL (\emph{i.e.} the output
+#' will include features for which both errors and errors were raised.). At now, this
+#' argument accepts the error type \code{"ORPHANED_HOLE"}.
+#' @param print.log Indicates wether the clean logs have to be printed. Default 
+#' value is TRUE.
+#' @return an object extending the \code{\link[sp]{Spatial-class}}
+#' as defined in \pkg{sp}, with cleaned geometries.
+#'
+#' @aliases clgeo_Clean
+#' 
+#' @keywords geometry validity summary clean
+#' 
+#'
 clgeo_Clean <- function(sp, errors.only = NULL, print.log = TRUE){
   
   report <- clgeo_CollectionReport(sp)
