@@ -12,8 +12,8 @@ require(maptools)
 
 context("clgeo_Clean")
 
-path <- system.file("extdata", package = "cleangeo")
-sp <- rgdal:::readOGR(dsn = path,layer = "example")
+file <- system.file("extdata", "example.shp" package = "cleangeo")
+sp <- readShapePoly(file)
 report <- NULL
 nv <- NULL
 
