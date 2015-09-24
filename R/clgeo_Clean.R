@@ -18,7 +18,7 @@
 #' will include features for which both errors and errors were raised.). At now, this
 #' argument accepts the error type \code{"ORPHANED_HOLE"}.
 #' @param print.log Indicates wether the clean logs have to be printed. Default 
-#' value is TRUE.
+#' value is FALSE.
 #' @return an object extending the \code{\link[sp]{Spatial-class}}
 #' as defined in \pkg{sp}, with cleaned geometries.
 #'
@@ -27,7 +27,7 @@
 #' @keywords geometry validity summary clean
 #' 
 #'
-clgeo_Clean <- function(sp, errors.only = NULL, print.log = TRUE){
+clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
@@ -73,7 +73,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = TRUE){
           }
             
           #test clean geometry validity
-          if(is.null(errors.only) & !isValid){
+          if(is.null(errors.only) && !isValid){
             if(print.log){
               print(paste("Cleaning geometry at index ", x, sep=""))
             }
@@ -82,6 +82,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = TRUE){
           feature <- feature@polygons[[1]]
         }
       }
+
       return(feature)
     }),
     pO = 1:length(sp),

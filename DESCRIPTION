@@ -1,18 +1,16 @@
 Package: cleangeo
 Version: 0.1
-Date: 2014-09-29
-Title: A set of utility tools to clean geometries
+Date: 2015-09-24
+Title: A Set of Utility Tools to Clean Geometries
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends:
     R (>= 2.15)
 Imports:
-    sp,
-    maptools,
-    rgeos
+    sp, rgeos, maptools
 Suggests:
-    testthat
-Description: A set of utility tools to clean geometries
+    testthat, rgdal
+Description: A set of utility tools to clean geometries from spatial objects.
 License: GPL (>= 2)
 URL: https://github.com/eblondel/cleangeo
 BugReports: https://github.com/eblondel/cleangeo/issues

@@ -1,6 +1,7 @@
 import(sp)
-import(maptools)
 import(rgeos)
+import(maptools)
+
 
 export(
  clgeo_GeometryReport,
