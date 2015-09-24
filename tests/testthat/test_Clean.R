@@ -12,7 +12,7 @@ require(maptools)
 
 context("clgeo_Clean")
 
-file <- system.file("extdata", "example.shp" package = "cleangeo")
+file <- system.file("extdata", "example.shp", package = "cleangeo")
 sp <- readShapePoly(file)
 report <- NULL
 nv <- NULL
