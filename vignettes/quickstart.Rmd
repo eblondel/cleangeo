@@ -1,0 +1,82 @@
+---
+title: "quickstart"
+author: "Emmanuel Blondel"
+date: "Friday, September 25, 2015"
+output: html_document
+---
+
+# cleangeo quickstart guide
+
+The goal of this document is to get you up and running with **cleangeo** as quickly as possible.
+
+**cleangeo** was initially born from some assistance provided to users that were facing issues in processing spatial data in R (see the original post at <http://gis.stackexchange.com/questions/113964/fixing-orphaned-holes-in-r/115203#115203>).
+
+The main problem with their data is that some spatial objects did not have valid geometries, exposing different types of geometry errors, preventing any easy spatial data processing with **rgeos**. Then, **cleangeo** was built in order to facilitate handling and catching **rgeos** geometry issues, and provide an utility to _clean_ the spatial objects.
+
+This short document shows you how to inspect spatial objects, and clean them with **cleangeo**.
+
+## Install cleangeo
+
+For the moment, ``cleangeo`` can be installed from its development repository hosted in Github. For this, you will need the ``devtools`` package and run:
+
+```{r, eval=FALSE}
+devtools::install_github("eblondel/cleangeo")
+```
+
+It is planned to publish soon ``cleangeo`` to CRAN.
+
+## Load cleangeo
+
+To load rsdmx in R, do the following:
+
+```{r}
+library(cleangeo)
+```
+
+## Work with cleangeo
+
+Let's load the package and read some some test spatial objects.
+
+```{r}
+file <- system.file("extdata", "example.shp", package = "cleangeo")
+
+require(maptools)
+sp <- readShapePoly(file)
+```
+
+The next step is to _inspect_ these spatial objects, in order to detect potential geometry issues, and make a ``summary``:
+
+```{r}
+report <- clgeo_CollectionReport(sp)
+clgeo_SummaryReport(report)
+```
+
+By analysing this report, you will see that 2 of the 3 spatial objects are not valid. One issue deals with a problem of _geometry validity_, while the second one reports an ``rgeos`` error of _orphaned hole_ . Quite interesting to have such comprehensive report, but _how to fix these issues?_ This is where **cleangeo** can really help you! so let's try to **clean** these spatial objects.
+
+The below one-line code uses ``clgeo_Clean`` on our spatial objects.
+
+```{r}
+sp.clean <- clgeo_Clean(sp)
+
+```
+
+And now? Well, let's check the new spatial objects!
+
+```{r}
+report.clean <- clgeo_CollectionReport(sp.clean)
+clgeo_SummaryReport(report.clean)
+
+```
+
+Spatial objects do not have geometry error anymore! To double check, we can try to check the geometry validity with ``rgeos``:
+
+```{r}
+require(rgeos)
+sapply(slot(sp.clean, "polygons"), function(x){
+  gIsValid(SpatialPolygons(Srl = list(x)))
+})
+
+```
+
+And that's it!
+
