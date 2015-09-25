@@ -31,8 +31,8 @@ test_that("clgeo_CollectionReport",{
  
   expect_equal(as.character(report[2,"type"]), "rgeos_validity")
   expect_equal(as.character(report[2,"issue_type"]), "GEOM_VALIDITY")
-  expect_equal(as.character(report[3,"type"]), "rgeos_error")
-  expect_equal(as.character(report[3, "issue_type"]), "ORPHANED_HOLE")
+  expect_equal(as.character(report[3,"type"]), "rgeos_validity")
+  expect_equal(as.character(report[3, "issue_type"]), "GEOM_VALIDITY")
   
 })
 

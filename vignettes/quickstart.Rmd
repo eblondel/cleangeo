@@ -51,7 +51,7 @@ report <- clgeo_CollectionReport(sp)
 clgeo_SummaryReport(report)
 ```
 
-By analysing this report, you will see that 2 of the 3 spatial objects are not valid. One issue deals with a problem of _geometry validity_, while the second one reports an ``rgeos`` error of _orphaned hole_ . Quite interesting to have such comprehensive report, but _how to fix these issues?_ This is where **cleangeo** can really help you! so let's try to **clean** these spatial objects.
+By analysing this report, you will see that 2 of the 3 spatial objects are not valid. The issues deal with a problem of _geometry validity_. Quite interesting to have such comprehensive report, but _how to fix these issues?_ This is where **cleangeo** can really help you! so let's try to **clean** these spatial objects.
 
 The below one-line code uses ``clgeo_Clean`` on our spatial objects.
 
