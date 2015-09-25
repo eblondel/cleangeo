@@ -7,7 +7,7 @@ Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends:
     R (>= 2.15)
 Imports:
-    sp, rgeos, maptools
+    methods, sp, rgeos, maptools
 Suggests:
     testthat
 Description: A set of utility tools to clean geometries from spatial objects.

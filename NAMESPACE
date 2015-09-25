@@ -1,3 +1,4 @@
+importFrom("methods", "as", "slot", "slot<-")
 import(sp)
 import(rgeos)
 import(maptools)
