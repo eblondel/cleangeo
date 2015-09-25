@@ -24,6 +24,14 @@ Function to get the list of index of suspicious geometries within a spatial data
 collection, given a spatial data collection report returned by  the function
 \code{\link{clgeo_CollectionReport}}
 }
+\examples{
+require(maptools)
+ file <- system.file("extdata", "example.shp", package = "cleangeo")
+ sp <- readShapePoly(file)
+
+ report <- clgeo_CollectionReport(sp)
+ nv <- clgeo_SuspiciousFeatures(report)
+}
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
 }

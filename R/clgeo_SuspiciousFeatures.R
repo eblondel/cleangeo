@@ -22,6 +22,14 @@
 #' objects tagged as suspicious (\emph{i.e.} that are not valid acccording to OGC
 #' specifications)
 #'
+#' @examples
+#'  require(maptools)
+#'  file <- system.file("extdata", "example.shp", package = "cleangeo")
+#'  sp <- readShapePoly(file)
+#'  
+#'  report <- clgeo_CollectionReport(sp)
+#'  nv <- clgeo_SuspiciousFeatures(report)
+#'
 #' @seealso \code{\link{clgeo_CollectionReport}}
 #' 
 #' @aliases clgeo_SuspiciousFeatures

@@ -24,6 +24,14 @@ gives the counting by value for each of the report columns:
 Function to get summary of a spatial data collection report returned by
 \code{\link{clgeo_CollectionReport}}
 }
+\examples{
+require(maptools)
+ file <- system.file("extdata", "example.shp", package = "cleangeo")
+ sp <- readShapePoly(file)
+
+ report <- clgeo_CollectionReport(sp)
+ clgeo_SummaryReport(report)
+}
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
 }

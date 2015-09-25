@@ -24,6 +24,13 @@ Function to get a spatial data collection validation report. The function output
 a \code{data.frame} binding all geometry validity reports, each one produced by
 \code{\link{clgeo_GeometryReport}}
 }
+\examples{
+require(maptools)
+ file <- system.file("extdata", "example.shp", package = "cleangeo")
+ sp <- readShapePoly(file)
+
+ report <- clgeo_CollectionReport(sp)
+}
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
 }

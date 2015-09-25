@@ -25,6 +25,15 @@ as defined in \pkg{sp}, with cleaned geometries.
 \description{
 Function to clean a spatial data collection
 }
+\examples{
+require(maptools)
+ file <- system.file("extdata", "example.shp", package = "cleangeo")
+ sp <- readShapePoly(file)
+
+ sp.clean <- clgeo_Clean(sp)
+ report.clean <- clgeo_CollectionReport(sp.clean)
+ clgeo_SummaryReport(report.clean)
+}
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
 }

@@ -22,6 +22,13 @@
 #'   \item \emph{error_msg} catched message when error raised about geometry
 #'   \item \emph{warning_msg} catched message when warning raised about geometry
 #' }
+#' 
+#' @examples
+#'  require(maptools)
+#'  file <- system.file("extdata", "example.shp", package = "cleangeo")
+#'  sp <- readShapePoly(file)
+#'  
+#'  report <- clgeo_CollectionReport(sp)
 #'
 #' @seealso \code{\link{clgeo_GeometryReport}}
 #' 

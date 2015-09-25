@@ -22,6 +22,15 @@
 #' @return an object extending the \code{\link[sp]{Spatial-class}}
 #' as defined in \pkg{sp}, with cleaned geometries.
 #'
+#' @examples
+#'  require(maptools)
+#'  file <- system.file("extdata", "example.shp", package = "cleangeo")
+#'  sp <- readShapePoly(file)
+#'  
+#'  sp.clean <- clgeo_Clean(sp)
+#'  report.clean <- clgeo_CollectionReport(sp.clean)
+#'  clgeo_SummaryReport(report.clean)
+#'
 #' @aliases clgeo_Clean
 #' 
 #' @keywords geometry validity summary clean
