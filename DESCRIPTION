@@ -1,7 +1,7 @@
 Package: cleangeo
 Version: 0.1-0
 Date: 2015-09-25
-Title: A Set of Utility Tools to Clean Geometries
+Title: Cleaning Geometries from Spatial Objects
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends:
@@ -10,7 +10,11 @@ Imports:
     methods, sp, rgeos, maptools
 Suggests:
     testthat
-Description: A set of utility tools to clean geometries from spatial objects.
+Description:
+  cleangeo provides a set of utility tools to inspect spatial objects, facilitate 
+  handling and reporting of topology errors and geometry validity issues. Finally, it provides
+  a geometry cleaner that will fix all geometry problems, and eliminate (at least reduce) the 
+  likelihood of having issues when doing spatial data processing.
 License: GPL (>= 2)
 URL: https://github.com/eblondel/cleangeo
 BugReports: https://github.com/eblondel/cleangeo/issues

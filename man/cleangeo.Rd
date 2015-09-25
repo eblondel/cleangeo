@@ -4,10 +4,12 @@
 \name{cleangeo}
 \alias{cleangeo}
 \alias{cleangeo-package}
-\title{A Set of Utility Tools to Clean Geometries}
+\title{Clean Geometries from Spatial Objects}
 \description{
-cleangeo provides you a set of utility tools to inspect spatial objects,
-report errors by type and clean geometries.
+cleangeo provides a set of utility tools to inspect spatial objects, facilitate handling and
+reporting of topology errors and geometry validity issues.  Finally, it provides a geometry
+cleaner that will fix all geometry problems, and  eliminate (at least reduce) the likelihood
+of having issues when doing spatial data processing.
 }
 \details{
 \tabular{ll}{
