@@ -12,9 +12,9 @@ Suggests:
     testthat
 Description:
   Provides a set of utility tools to inspect spatial objects, facilitate
-  handling and reporting of topology errors and geometry validity issues. 
-  Finally, it provides a geometry cleaner that will fix all geometry problems, 
-  and eliminate (at least reduce) the likelihood of having issues when doing 
+  handling and reporting of topology errors and geometry validity issues.
+  Finally, it provides a geometry cleaner that will fix all geometry problems,
+  and eliminate (at least reduce) the likelihood of having issues when doing
   spatial data processing.
 License: GPL (>= 2)
 URL: https://github.com/eblondel/cleangeo
