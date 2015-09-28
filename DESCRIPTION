@@ -1,6 +1,6 @@
 Package: cleangeo
-Version: 0.1-0
-Date: 2015-09-25
+Version: 0.1-1
+Date: 2015-09-28
 Title: Cleaning Geometries from Spatial Objects
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>

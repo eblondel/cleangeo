@@ -14,6 +14,7 @@ context("clgeo_Clean")
 
 file <- system.file("extdata", "example.shp", package = "cleangeo")
 sp <- readShapePoly(file)
+sp.ids <- sapply(slot(sp, "polygons"), slot, "ID")
 report <- NULL
 nv <- NULL
 
@@ -46,8 +47,14 @@ test_that("clgeo_SuspiciousFeatures",{
 #Clean
 test_that("clgeo_Clean",{
   sp.fixed <- clgeo_Clean(sp, print.log = FALSE)
+  
+  #data integrity
+  expect_equal(sapply(slot(sp.fixed, "polygons"), slot, "ID"), sp.ids)
+  expect_equal(slot(sp,"data"), slot(sp.fixed, "data"))
+  
+  #cleaning results
   report.fixed <- clgeo_CollectionReport(sp.fixed)
-  expect_true(all(report.fixed[,"valid"]))
   nv.fixed <- clgeo_SuspiciousFeatures(report.fixed)
+  expect_true(all(report.fixed[,"valid"]))
   expect_equal(nv.fixed, NA)
 })

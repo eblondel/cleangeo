@@ -43,11 +43,11 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
 
   fixed.sp <- SpatialPolygons(
     Srl = lapply(1:length(sp), function(x){
-      feature <- slot(sp, "polygons")[[x]]
-      ID <- slot(feature, "ID")
+      polygon <- slot(sp, "polygons")[[x]]
+      ID <- slot(polygon, "ID")
       if(!all(is.na(nv))){
         if(x %in% nv){          
-          polygons <- slot(feature, "Polygons")
+          polygons <- slot(polygon, "Polygons")
           poly.nb <- length(polygons)
           removedHoles <- 0
           for(i in 1:poly.nb){
@@ -59,15 +59,13 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
                 print(paste("Cleaning orphaned holes at index ", x, sep=""))
               }
               
-              slt <- slot(feature, "Polygons")				
-              slt[[i - removedHoles]] <- NULL
+              polygons[[i - removedHoles]] <- NULL
               removedHoles <- removedHoles + 1
-              slot(feature, "Polygons") <- slt
+              slot(polygon, "Polygons") <- polygons
             }
           }
           
-          feature <- SpatialPolygons(Srl = list(feature), pO = 1L,
-                                     proj4string = CRS(proj4string(sp)))
+          polygon <- SpatialPolygons(Srl = list(polygon))
           
           #testing validity after removing holes
           isValid <- report[x,]$valid
@@ -75,32 +73,35 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
             if(print.log){
               print(paste("Checking geometry validity at index ", x, sep=""))
             }
-              
-            slot(feature, "polygons") <- lapply(slot(feature, "polygons"),
-                                                checkPolygonsHoles)
-            isValid <- gIsValid(feature)
-          }
             
+            slot(polygon, "polygons") <- lapply(slot(polygon, "polygons"),
+                                                checkPolygonsHoles)
+            isValid <- gIsValid(polygon)
+          }
+          
           #test clean geometry validity
           if(is.null(errors.only) && !isValid){
             if(print.log){
               print(paste("Cleaning geometry at index ", x, sep=""))
             }
-            feature <- gBuffer(feature, id = ID, width = 0)
+            polygon <- gBuffer(polygon, id = ID, width = 0)
           }
-          feature <- feature@polygons[[1]]
+          polygon <- polygon@polygons[[1]]
         }
       }
-
-      return(feature)
+      
+      #index integrity
+      slot(polygon, "ID") <- ID
+      
+      return(polygon)
     }),
-    pO = 1:length(sp),
     proj4string = CRS(proj4string(sp))
   )
   
   if(class(sp) == "SpatialPolygonsDataFrame"){
-    fixed.sp <- SpatialPolygonsDataFrame(Sr = fixed.sp,
-                                         data = as(sp, "data.frame"))
+    sp.df <- as(sp, "data.frame")
+    row.names(sp.df) <- sapply(slot(fixed.sp,"polygons"), slot, "ID")
+    fixed.sp <- SpatialPolygonsDataFrame(Sr = fixed.sp, data = sp.df)
   }
   
   return(fixed.sp)
