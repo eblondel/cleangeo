@@ -1,0 +1,287 @@
+\documentclass{beamer}
+  \usepackage[utf8]{inputenc}
+  \usepackage{hyperref}
+  \usepackage{xspace}
+  \usepackage{xcolor}
+  \usepackage{graphicx}
+  \usepackage{Sweave}
+  \usepackage{multicol}
+  
+  \definecolor{links}{HTML}{2A1B81}
+  \hypersetup{colorlinks,linkcolor=,urlcolor=links}  
+  
+  %Beamer properties
+  \usetheme{Warsaw} %{Boadilla}
+  \useoutertheme{miniframes}
+  \usecolortheme{seahorse}
+  \usecolortheme{rose}
+  \setbeamerfont{footnote}{size=\tiny}
+
+  % Add R Logo
+  \definecolor{Rcolor}{RGB}{150,160,190}
+
+  \newcommand{\Rx}{\fontsize{10pt}{12pt}\selectfont
+  	\raisebox{.3em}{\hspace{1.2em}%
+  		\llap{\resizebox{1.09em}{.5em}{\color{black}$\bigcirc$}}%
+  		\llap{\resizebox{1.199em}{.55em}{\color{darkgray}$\bigcirc$}}%
+  		\llap{\resizebox{1.19em}{.52em}{\color{gray!50}$\bigcirc$}}%
+		\llap{\resizebox{1.1em}{.5em}{\color{gray}$\bigcirc$}}%
+		\llap{\resizebox{1.25em}{.55em}{\color{gray}$\bigcirc$}}%
+	}%
+	\hspace{-.85em}%
+	\textbf{%
+		%\resizebox{.55em}{1.5ex}{\textcolor{black!80}{\textsf{R}}}%
+		\textcolor{black}{\textsf{R}}%
+		\hspace{-.025em}\raisebox{.01em}{\llap{\textcolor{Rcolor}{\textsf{R}}}}%
+	}}%
+
+  \newbox\rbox
+  \savebox\rbox{\scalebox{0.1}{\Rx}}
+  \makeatletter
+  \def\R{\scalebox{\f@size}{\usebox\rbox}\xspace}
+  \makeatletter
+  
+  %S4 representations (in case)
+  \newenvironment<>{cleangeo}[1]{%
+  \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\tiny,formatcom=\color{black}}
+  \setbeamerfont{block title}{size=\normalsize}
+  \setbeamerfont{block body}{size=\scriptsize}
+  \setbeamercolor{block title}{fg=white,bg=gray!90!black}%
+  \begin{block}#2{#1 \R representation}}{\end{block}}
+  
+  %R code
+  \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\scriptsize,formatcom=\color{blue}}
+  \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\tiny,formatcom=\color{gray}}
+
+  %cleangeo presentation%
+  %---------------------%
+
+  \title{cleangeo - Cleaning Geometries from Spatial Objects in \R}
+  \author[E. Blondel]{Emmanuel Blondel \\ \texttt{emmanuel.blondel1@gmail.com}}
+  \institute{CEO - International Consultant}
+  \date{September 30, 2015}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%\setbeamertemplate{section in toc}{\protect\block{Research Question~\inserttocsectionnumber}\inserttocsection\protect\endblock}
+
+\begin{document}
+
+  \begin{frame}
+  	\titlepage
+  \end{frame}
+
+\section{Introduction}
+  
+  %Introducing cleangeo%
+  %--------------------%
+  \begin{frame}
+  	\frametitle{cleangeo}
+  	\framesubtitle{R spatial data processing}
+  	
+	\R provides a lot of facilities to read and manipulate spatial data. We can mention some packages such as:
+	\begin{itemize}
+		\item \texttt{sp}, which provides a set of classes and methods to handle spatial objects
+		\item \texttt{maptools}, a set of tools for reading and handling Spatial Objects
+		\item \texttt{rgdal}, which provides an interface to the well-known \href{http://www.gdal.org/}{Geospatial Data Abstraction Library (GDAL)}
+		\item \texttt{rgeos}, which provides an interface to the widely used \href{http://trac.osgeo.org/geos/}{Geometry Engine, Open Source (GEOS)} library. 	
+	\end{itemize}	  	
+  	
+	The main problem comes when spatial objects did not have valid geometries, or expose different types of geometry errors (e.g. orphaned holes), which prevents any easy spatial data processing.  	
+  	
+  \end{frame}
+
+  %cleangeo package%
+  %-------------%
+  \begin{frame}
+  	\frametitle{cleangeo}
+  	\framesubtitle{A package for cleaning geometries from spatial objects in R}
+  	
+	\texttt{cleangeo} was built in order:
+	\begin{itemize}
+		\item to facilitate handling and catching rgeos geometry issues
+		\item to provide an utility to clean the spatial objects.
+	\end{itemize}
+
+\vspace{1cm}
+	 	
+	\texttt{cleangeo} appears to a useful tool to check, and eventual clean the data prior any spatial data processing.	
+  	
+  \end{frame}
+  
+ 
+\section{Using cleangeo} 
+ 
+  %cleangeo package - Usage %
+  %----------------------%
+  %Installing cleangeo%
+  \begin{frame}[containsverbatim]
+  	\frametitle{cleangeo}
+  	\framesubtitle{Usage - Installing cleangeo}
+  	\texttt{cleangeo} can be installed:
+  	\begin{itemize}
+  		\item from CRAN
+\begin{Schunk}
+\begin{Sinput}
+R> install.packages("cleangeo")
+\end{Sinput}
+\end{Schunk}
+ 	 
+ 	 	\vspace{0.1cm}
+  		\item from Github, for latest updates (requires \texttt{devtools} package)
+\begin{Schunk}
+\begin{Sinput}
+R> require(devtools)
+R> install_github("eblondel/cleangeo")
+\end{Sinput}
+\end{Schunk}
+  	\end{itemize}
+	
+	\vspace{0.1cm}
+	Load \texttt{cleangeo} in R using:
+\begin{Schunk}
+\begin{Sinput}
+     R> require(cleangeo)
+\end{Sinput}
+\end{Schunk}
+		 
+  \end{frame}
+ 
+  %Usage - Identify geometry issues in spatial objects%
+  \begin{frame}[containsverbatim]
+  	\frametitle{cleangeo}
+  	\framesubtitle{Usage - Identify geometry issues in spatial objects}
+
+Let's load some sample data in \R:
+
+\begin{Schunk}
+\begin{Sinput}
+R> require(maptools)
+R> file <- system.file("extdata", "example.shp", package = "cleangeo")
+R> sp <- readShapePoly(file)
+\end{Sinput}
+\end{Schunk}
+
+\texttt{cleangeo} first allows to inspect spatial objects, and detect eventual issues:
+
+\begin{Schunk}
+\begin{Sinput}
+R> sp.report <- clgeo_CollectionReport(sp)
+R> sp.summary <- clgeo_SummaryReport(sp.report)
+\end{Sinput}
+\begin{Soutput}
+             type     valid                 issue_type
+ rgeos_validity:2   Mode :logical   GEOM_VALIDITY:2   
+ NA's          :1   FALSE:2         NA's         :1   
+                    TRUE :1                           
+                    NA's :0                           
+\end{Soutput}
+\end{Schunk}
+
+The output indicates that 2 spatial objects have a problem of geometry validity.
+
+  \end{frame}
+  
+ %Usage - Clean geometries spatial objects%
+  \begin{frame}[containsverbatim]
+  	\frametitle{cleangeo}
+  	\framesubtitle{Usage - Clean geometries spatial objects}
+
+\texttt{cleangeo} allows you to clean spatial objects:
+
+\begin{Schunk}
+\begin{Sinput}
+R> sp.fixed <- clgeo_Clean(sp)
+\end{Sinput}
+\end{Schunk}
+
+Let's analyse the new spatial objects:
+
+\begin{Schunk}
+\begin{Sinput}
+R> sp.fixed.report <- clgeo_CollectionReport(sp.fixed)
+R> sp.fixed.summary <- clgeo_SummaryReport(sp.fixed.report)
+\end{Sinput}
+\begin{Soutput}
+   type    valid         issue_type
+ NA's:3   Mode:logical   NA's:3    
+          TRUE:3                   
+          NA's:0                   
+          
+\end{Soutput}
+\end{Schunk}
+
+And that's it! Now your spatial objects have clean geometries, you can safely do some spatial data processing on it. 
+
+  \end{frame}
+  
+  
+\section{Conclusions \& Perspectives}
+  
+  %rsdmx package - Conclusions & Perspectives %
+  %-------------------------------------------%
+  \begin{frame}
+  	\frametitle{cleangeo}
+  	\framesubtitle{Conclusions and Perspectives}
+  	
+Although \texttt{cleangeo} is at its early stages, it has proved to be a real benefit in the field of spatial data processing, providing a \textbf{quick} and \textbf{simple} way to check geometry issues and clean spatial objects.
+  		
+\vspace{1cm} 		
+  		
+\texttt{cleangeo} is currently focused on cleaning \texttt{SpatialPolygons} objects. A direct perspective is to extend it to other \texttt{Spatial*} objects.
+ 
+\vspace{1cm}  
+  		
+Any suggestion from users is welcome to strenghten the \texttt{cleangeo} package.
+  	
+  \end{frame}
+  
+   %rsdmx package - Fundings %
+  %--------------------------%
+  \begin{frame}
+  	\frametitle{cleangeo} 
+   	\framesubtitle{Looking for Sponsors}	
+  	
+\texttt{cleangeo} was initially born from some assistance provided to users that were facing issues in processing spatial data in R (see the original \href{http://gis.stackexchange.com/questions/113964/fixing-orphaned-holes-in-r}{post}). The prototype package was made available on Github on a voluntary basis in support to this users request.
+
+\vspace{0.5cm}
+
+To guarantee the sustainability of \texttt{cleangeo}, we are seeking for \textbf{fundings}, throught \textit{sponsoring} or \textit{donations} to:
+  	\begin{itemize}
+		\item \textbf{implement, test, validate and release improvements}
+		\item \textbf{guarantee a quality maintenance} of the package
+		\item \textbf{provide support} to users and institutions that may take advantage of \texttt{cleangeo}
+  	\end{itemize}
+
+\vspace{0.5cm}  	
+  	
+If you are interesting in supporting \texttt{cleangeo}, please do not hesitate to contact \href{mailto:emmanuel.blondel1@gmail.com}{me}!  	
+  	
+  \end{frame}
+  
+  %cleangeo package - cleangeo on the web %
+  %---------------------------------------%
+  \begin{frame}
+  	\frametitle{cleangeo}
+  	\framesubtitle{on the web}
+  	\begin{itemize}
+		\item on Github:
+		\begin{itemize}
+			\item source code: \href{https://github.com/eblondel/cleangeo}{https://github.com/eblondel/cleangeo}
+			\vspace{0.1cm}
+			\item online documentation: \href{https://github.com/eblondel/cleangeo/blob/master/vignettes/quickstart.Rmd}{https://github.com/eblondel/cleangeo/blob/master/vignettes/quickstart.Rmd}
+			\vspace{0.1cm}
+		\end{itemize}	
+		\vspace{0.1cm}
+		\item on the Comprehensive R Archive Network (CRAN): \href{http://cran.r-project.org/package=cleangeo}{http://cran.r-project.org/package=cleangeo}
+  	\end{itemize}  	
+  \end{frame}  
+  
+
+\end{document}
