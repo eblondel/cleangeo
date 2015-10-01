@@ -1,6 +1,6 @@
 Package: cleangeo
 Version: 0.1-1
-Date: 2015-09-28
+Date: 2015-10-01
 Title: Cleaning Geometries from Spatial Objects
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
@@ -9,7 +9,7 @@ Depends:
 Imports:
     methods, sp, rgeos, maptools
 Suggests:
-    testthat
+    testthat, knitr
 Description:
   Provides a set of utility tools to inspect spatial objects, facilitate
   handling and reporting of topology errors and geometry validity issues.
@@ -18,4 +18,5 @@ Description:
   spatial data processing.
 License: GPL (>= 2)
 URL: https://github.com/eblondel/cleangeo
+VignetteBuilder: knitr
 BugReports: https://github.com/eblondel/cleangeo/issues
