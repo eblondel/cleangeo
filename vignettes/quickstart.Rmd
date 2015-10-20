@@ -25,7 +25,7 @@ It is planned to publish soon ``cleangeo`` to CRAN.
 
 ## Load cleangeo
 
-To load rsdmx in R, do the following:
+To load the package in R, do the following:
 
 ```{r}
 library(cleangeo)
