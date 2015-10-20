@@ -11,3 +11,4 @@ Some projects using ``cleangeo``:
 
 * [Ocean Health Index](https://github.com/OHI-Science)
 * [UNHCR Iraq Information Management](https://github.com/unhcr-iraq)
+* [UN-FAO Fisheries Global Information System (FIGIS)](https://github.com/openfigis)
