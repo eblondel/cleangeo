@@ -49,21 +49,23 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
         polygons <- slot(polygon, "Polygons")
         poly.nb <- length(polygons)
         removedHoles <- 0
-        for(i in 1:poly.nb){
-          #if we found an orphaned hole, we remove it
-          if(slot(polygons[[i]], "hole")
-             & dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
-            
-            if(removedHoles == 0 & print.log){
-              print(paste("Cleaning orphaned holes at index ", x, sep=""))
+        
+        if(poly.nb > 0){
+          for(i in 1:poly.nb){
+            #if we found an orphaned hole, we remove it
+            if(slot(polygons[[i]], "hole")
+               & dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
+              
+              if(removedHoles == 0 & print.log){
+                print(paste("Cleaning orphaned holes at index ", x, sep=""))
+              }
+              
+              polygons[[i - removedHoles]] <- NULL
+              removedHoles <- removedHoles + 1
+              slot(polygon, "Polygons") <- polygons
             }
-            
-            polygons[[i - removedHoles]] <- NULL
-            removedHoles <- removedHoles + 1
-            slot(polygon, "Polygons") <- polygons
           }
         }
-        
         polygon <- SpatialPolygons(Srl = list(polygon))
         
         #testing validity after removing holes
