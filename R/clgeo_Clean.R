@@ -51,6 +51,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
         removedHoles <- 0
         
         if(poly.nb > 0){
+          newpolygons <- polygons
           for(i in 1:poly.nb){
             #if we found an orphaned hole, we remove it
             if(slot(polygons[[i]], "hole")
@@ -60,11 +61,11 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
                 print(paste("Cleaning orphaned holes at index ", x, sep=""))
               }
               
-              polygons[[i - removedHoles]] <- NULL
+              newpolygons[[i - removedHoles]] <- NULL
               removedHoles <- removedHoles + 1
-              slot(polygon, "Polygons") <- polygons
             }
           }
+          slot(polygon, "Polygons") <- newpolygons
         }
         polygon <- SpatialPolygons(Srl = list(polygon))
         
