@@ -70,8 +70,24 @@ test_that("Clean - 'bowtie' polygons",{
 })
 
 test_that("Clean - 'bowtie' polygons with holes",{
+  
   wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3))"
   sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5),(7 3.5, 7 4, 8 4, 7 3.5))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5),(7 3.5, 7 4, 8 3.5, 8 4, 7 3.5))"
+  
 })
 
 #validation is OK (managed by rgeos)
