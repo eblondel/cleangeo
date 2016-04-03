@@ -69,6 +69,11 @@ test_that("Clean - 'bowtie' polygons",{
   sp <- rgeos::readWKT(wkt)
 })
 
+test_that("Clean - 'bowtie' polygons with holes",{
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3))"
+  sp <- rgeos::readWKT(wkt)
+})
+
 #validation is OK (managed by rgeos)
 test_that("Clean - Square with wrong orientation",{
   wkt <- "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))"
