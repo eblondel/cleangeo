@@ -1,13 +1,13 @@
 Package: cleangeo
 Version: 0.1-2
-Date: 2015-11-27
+Date: 2015-04-18
 Title: Cleaning Geometries from Spatial Objects
 Author: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends:
     R (>= 2.15)
 Imports:
-    methods, sp, rgeos, maptools
+    methods, sp, rgeos, maptools, RTriangle
 Suggests:
     testthat, knitr
 Description:

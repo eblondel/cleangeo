@@ -2,6 +2,7 @@ importFrom("methods", "as", "slot", "slot<-")
 import(sp)
 import(rgeos)
 import(maptools)
+import(RTriangle)
 
 
 export(
@@ -9,5 +10,8 @@ export(
  clgeo_CollectionReport,
  clgeo_SummaryReport,
  clgeo_SuspiciousFeatures,
+ clgeo_CleanByTriangulation.Polygon,
+ clgeo_CleanByTriangulation.Polygons,
+ clgeo_CleanByTriangulation.SpatialPolygons,
  clgeo_Clean
 )

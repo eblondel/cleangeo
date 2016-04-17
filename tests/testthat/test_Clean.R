@@ -62,11 +62,13 @@ test_that("clgeo_Clean",{
 #Clean cases
 #(list of cases taken from https://github.com/tudelft3d/prepair)
 
-#TODO case to investigate
-#-> validation using gBuffer NOT OK (lose of area)
+#validation is OK (managed by cleangeo)
 test_that("Clean - 'bowtie' polygons",{
   wkt <- "POLYGON((0 0, 0 10, 10 0, 10 10, 0 0))"
   sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
 })
 
 #validation is OK (managed by rgeos)
@@ -76,9 +78,7 @@ test_that("Clean - Square with wrong orientation",{
   expect_true(gIsValid(sp))
 })
 
-#TODO case to investigate
-#-> validation may be considered OK (nested ring is removed)
-#-> validation may be considered NOT OK? (lose of area - expect 2 overlapping polygons)
+#TODO case to investigate (managed by cleangeo)
 test_that("Clean - Inner ring with one edge sharing part of an edge of the outer ring",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0),(5 2,5 7,10 7, 10 2, 5 2))"
   sp <- rgeos::readWKT(wkt)
@@ -96,15 +96,6 @@ test_that("Clean - Dangling edge",{
   expect_true(gIsValid(sp.clean))
 })
 
-#TODO case to investigate
-test_that("Clean - Outer ring not closed",{
-  wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10))"
-  #sp <- rgeos::readWKT(wkt)
-  #sp.clean <- clgeo_Clean(sp)
-  #expect_false(gIsValid(sp))
-  #expect_true(gIsValid(sp.clean))
-})
-
 #validation is OK (managed by cleangeo)
 test_that("Clean - Two adjacent inner rings",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 1 8, 3 8, 3 1, 1 1), (3 1, 3 8, 5 8, 5 1, 3 1))"
@@ -115,8 +106,34 @@ test_that("Clean - Two adjacent inner rings",{
 })
 
 #TODO case to investigate
-test_that("Clean - Polygon with an inner ring inside another inner ring:",{
+test_that("Clean - Nested polygon",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 8, 5 8, 5 2, 2 2, 2 8), (3 3, 4 3, 3 4, 3 3))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
+})
+
+test_that("Clean - Nested polygon",{
+  wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 9 1, 9 9, 1 9, 1 1),
+                  (2 2, 8 2, 8 8, 2 8, 2 2))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
+})
+
+test_that("Clean - Multiple nested polygon",{
+  wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 9 1, 9 9, 1 9, 1 1),
+                  (2 2, 8 2, 8 8, 2 8, 2 2),(3 3, 7 3, 7 7, 3 7, 3 3))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
+  
+  wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 9 1, 9 9, 1 9, 1 1),
+                  (2 2, 8 2, 8 8, 2 8, 2 2),(3 3, 7 3, 7 7, 3 7, 3 3),
+                  (4 4, 6 4, 6 6, 4 6, 4 4))"
   sp <- rgeos::readWKT(wkt)
   sp.clean <- clgeo_Clean(sp)
   expect_false(gIsValid(sp))
