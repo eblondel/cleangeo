@@ -71,6 +71,38 @@ test_that("Clean - 'bowtie' polygons",{
   expect_true(gIsValid(sp.clean))
 })
 
+#validation is OK (managed by cleangeo)
+test_that("Clean - 'bowtie' polygons with holes",{
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  sp.clean <- clgeo_Clean(sp)
+  expect_true(gIsValid(sp.clean))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  sp.clean <- clgeo_Clean(sp)
+  expect_true(gIsValid(sp.clean))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5),(7 3.5, 7 4, 8 4, 7 3.5))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  sp.clean <- clgeo_Clean(sp)
+  expect_true(gIsValid(sp.clean))
+  
+  wkt <- "POLYGON((0 0, 0 5, 3 10, 0 10, 10 0, 10 10, 0 0),(1 3, 2 3, 2 4, 1 4, 1 3),
+          (7 5, 7 6, 8 6, 8 5, 7 5),(7 3.5, 7 4, 8 3.5, 8 4, 7 3.5))"
+  sp <- rgeos::readWKT(wkt)
+  expect_false(gIsValid(sp))
+  sp.clean <- clgeo_Clean(sp)
+  expect_true(gIsValid(sp.clean))
+  
+})
+
 #validation is OK (managed by rgeos)
 test_that("Clean - Square with wrong orientation",{
   wkt <- "POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))"
@@ -78,7 +110,7 @@ test_that("Clean - Square with wrong orientation",{
   expect_true(gIsValid(sp))
 })
 
-#TODO case to investigate (managed by cleangeo)
+#validation is OK (managed by cleangeo)
 test_that("Clean - Inner ring with one edge sharing part of an edge of the outer ring",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0),(5 2,5 7,10 7, 10 2, 5 2))"
   sp <- rgeos::readWKT(wkt)
