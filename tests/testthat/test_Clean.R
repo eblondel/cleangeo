@@ -105,7 +105,7 @@ test_that("Clean - Two adjacent inner rings",{
   expect_true(gIsValid(sp.clean))
 })
 
-#TODO case to investigate
+#validation is OK (managed by cleangeo)
 test_that("Clean - Nested polygon",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (2 8, 5 8, 5 2, 2 2, 2 8), (3 3, 4 3, 3 4, 3 3))"
   sp <- rgeos::readWKT(wkt)
@@ -114,6 +114,7 @@ test_that("Clean - Nested polygon",{
   expect_true(gIsValid(sp.clean))
 })
 
+#validation is OK (managed by cleangeo)
 test_that("Clean - Nested polygon",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 9 1, 9 9, 1 9, 1 1),
                   (2 2, 8 2, 8 8, 2 8, 2 2))"
@@ -123,6 +124,7 @@ test_that("Clean - Nested polygon",{
   expect_true(gIsValid(sp.clean))
 })
 
+#validation is OK (managed by cleangeo)
 test_that("Clean - Multiple nested polygon",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 9 1, 9 9, 1 9, 1 1),
                   (2 2, 8 2, 8 8, 2 8, 2 2),(3 3, 7 3, 7 7, 3 7, 3 3))"

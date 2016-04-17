@@ -160,12 +160,6 @@ clgeo_CleanByTriangulation.Polygons <- function(p){
     trspholes <- SpatialPolygons(Sr = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
     slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
     
-    #before
-    #holes <- unlist(lapply(holes, clgeo_CleanByTriangulation.Polygon))
-    #if(!is.list(holes)) holes <- list(holes)
-    #polyholes <- Polygons(srl = holes, ID="1")
-    #trspholes <- SpatialPolygons(Sr = list(polyholes))
-    
     #difference
     spout <- gDifference(trsp, trspholes)
   }else{
