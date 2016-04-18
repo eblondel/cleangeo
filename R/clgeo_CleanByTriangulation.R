@@ -135,11 +135,16 @@ clgeo_CleanByTriangulation.Polygons <- function(p){
                                   function(x){
                                     return(!slot(x,"hole"))
                                   })]
-  polygons <- unlist(lapply(polygons, clgeo_CleanByTriangulation.Polygon))
-  if(!is.list(polygons)) polygons <- list(polygons)
-  poly <- Polygons(srl = polygons, ID="1")
-  trsp <- SpatialPolygons(Sr = list(poly))
-  trsp <- gUnaryUnion(trsp)
+  
+  
+  trsp <- SpatialPolygons(Sr = lapply(1:length(polygons), function(i){
+    po <- clgeo_CleanByTriangulation.Polygon(polygons[[i]])
+    if(!is.list(po)) po <- list(po)
+    poly <- Polygons(srl = po, ID = as.character(i))
+    return(poly)
+  }))
+  trsp <- gUnionCascaded(trsp, sapply(trsp@polygons, slot, "ID"))
+  trsp <- SpatialPolygons(Sr = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
   
   #holes
   holes <- slot(p, "Polygons")[sapply(slot(p,"Polygons"), slot, "hole")]
