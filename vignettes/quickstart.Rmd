@@ -15,7 +15,7 @@ This short document shows you how to inspect spatial objects, and clean them wit
 
 ## Install cleangeo
 
-For the moment, ``cleangeo`` can be installed from its development repository hosted in Github. For this, you will need the ``devtools`` package and run:
+``cleangeo`` is available for download from CRAN. To get the latest ``cleangeo`` you can install it from its development repository hosted in Github. For this, you will need the ``devtools`` package and run:
 
 ```{r, eval=FALSE}
 devtools::install_github("eblondel/cleangeo")
