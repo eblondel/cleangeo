@@ -86,7 +86,16 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
           if(print.log){
             print(paste("Cleaning geometry at index ", x, sep=""))
           }
-          polygon <- gBuffer(polygon, id = ID, width = 0)
+          attempt <- 1
+		      polygon <- gBuffer(polygon, id = ID, width = 0)
+		      while(attempt < 3){
+			      if(!gIsValid(polygon)){
+				      attempt <- attempt + 1
+      				polygon <- gBuffer(polygon, id = ID, width = 0)
+			      }else{
+				      break;
+			      }
+		      }
         }
         if(!is.null(polygon)){
           polygon <- polygon@polygons[[1]]
