@@ -15,7 +15,7 @@
 #' @return a list of objects of class \code{\link[sp]{Polygon-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
-#' @aliases clgeo_CleanByPolygonation
+#' @aliases clgeo_CleanByPolygonation.Polygon
 #' 
 #' @keywords geometry validity summary clean
 #' @note The polygonation method is a tentative alternate method to triangulation to clean
@@ -23,7 +23,7 @@
 #' applied.
 #'
 #' 
-clgeo_CleanByPolygonation.Polygon <- function(p, id){
+clgeo_CleanByPolygonation.Polygon <- function(p){
   pts <-  as.data.frame(p@coords)
   linesList <- lapply(1:(nrow(pts)-1),function(i){Line(pts[i:(i+1),])})
   
@@ -143,7 +143,7 @@ clgeo_CleanByPolygonation.Polygon <- function(p, id){
 #' @return an object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
-#' @aliases clgeo_CleanByPolygonation
+#' @aliases clgeo_CleanByPolygonation.Polygons
 #' 
 #' @keywords geometry validity summary clean
 #' @note The polygonation method is a tentative alternate method to triangulation to clean
