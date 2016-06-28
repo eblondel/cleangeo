@@ -70,30 +70,6 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
     })
   )
   
-  #util function to build line
-  buildLine <- function(start.coords, end.coords){
-    coords <- rbind(start.coords, end.coords); colnames(coords) <- c("x","y");
-    return(SpatialLines(list(Lines(slinelist = list(Line(coords)), ID = "1"))))
-  }
-  
-  #util function to calculate slope
-  slope <- function(line, abs = TRUE){
-    xy <- slot(slot(line,"lines")[[1]],"Lines")[[1]]@coords
-    slp <- (xy[2,1]-xy[1,1]) / (xy[2,2]-xy[1,2])
-    if(abs) slp <- abs(slp)
-    return(slp)
-  }
-  
-  combinedLines <- function(edge, spNewLines){
-    iscomb <- FALSE
-    for(i in 1:length(spNewLines)){
-      if(slope(edge) == slope(spNewLines[[i]]))
-        iscomb <- gIntersects(edge, spNewLines[[i]])
-        if(iscomb) break;
-    }
-    return(iscomb)
-  }
-  
   #all
   #sequence all coords but with lapply, starting with coords of the line after
   all.coords <- lapply(2:length(spNewLines),function(i){
