@@ -40,7 +40,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
-
+  
   fixed.sp.list <- lapply(1:length(sp), function(x){
     polygon <- slot(sp, "polygons")[[x]]
     ID <- slot(polygon, "ID")
@@ -53,17 +53,12 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
         if(poly.nb > 0){
           newpolygons <- polygons
           for(i in 1:poly.nb){
-            #if we found an orphaned hole or orphaned geometry, ie a polygon with
-            #less than 3 vertices, we remove it
-            if(dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
+            #if we found an orphaned hole, we remove it
+            if(slot(polygons[[i]], "hole")
+               & dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
               
-              if(print.log){
-                if(slot(polygons[[i]], "hole") & removedHoles == 0){
-                  print(paste("Cleaning orphaned holes at index ", x, sep=""))
-                }
-                if(!slot(polygons[[i]], "hole")){
-                  print(paste("Cleaning orphaned geometry at index ", x, sep=""))
-                }
+              if(removedHoles == 0 & print.log){
+                print(paste("Cleaning orphaned holes at index ", x, sep=""))
               }
               
               newpolygons[[i - removedHoles]] <- NULL
@@ -91,8 +86,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
           if(print.log){
             print(paste("Cleaning geometry at index ", x, sep=""))
           }
-          #polygon <- gBuffer(polygon, id = ID, width = 0)
-          polygon <- clgeo_CleanByTriangulation.SpatialPolygons(polygon)
+          polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
         }
         if(!is.null(polygon)){
           polygon <- polygon@polygons[[1]]
