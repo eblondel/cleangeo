@@ -38,13 +38,15 @@ applied to rebuild the source invalid geometry into one or more valid polygonal
 geometries.
 }
 \examples{
-require(maptools)
+\donttest{
+ require(maptools)
  file <- system.file("extdata", "example.shp", package = "cleangeo")
  sp <- readShapePoly(file)
 
  sp.clean <- clgeo_Clean(sp)
  report.clean <- clgeo_CollectionReport(sp.clean)
  clgeo_SummaryReport(report.clean)
+}
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}

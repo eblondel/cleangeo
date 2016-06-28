@@ -46,7 +46,7 @@ test_that("clgeo_SuspiciousFeatures",{
 
 #Clean
 test_that("clgeo_Clean",{
-  sp.fixed <- clgeo_Clean(sp, print.log = FALSE)
+  sp.fixed <- clgeo_Clean(sp, verbose = FALSE)
   
   #data integrity
   expect_equal(sapply(slot(sp.fixed, "polygons"), slot, "ID"), sp.ids)
@@ -120,15 +120,6 @@ test_that("Clean - Inner ring with one edge sharing part of an edge of the outer
 })
 
 #validation is OK (managed by cleangeo)
-test_that("Clean - Dangling edge",{
-  wkt <- "POLYGON((0 0, 10 0, 15 5, 10 0, 10 10, 0 10, 0 0))"
-  sp <- rgeos::readWKT(wkt)
-  sp.clean <- clgeo_Clean(sp)
-  expect_false(gIsValid(sp))
-  expect_true(gIsValid(sp.clean))
-})
-
-#validation is OK (managed by cleangeo)
 test_that("Clean - Two adjacent inner rings",{
   wkt <- "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 1 8, 3 8, 3 1, 1 1), (3 1, 3 8, 5 8, 5 1, 3 1))"
   sp <- rgeos::readWKT(wkt)
@@ -174,8 +165,21 @@ test_that("Clean - Multiple nested polygon",{
   expect_true(gIsValid(sp.clean))
 })
 
-#under investigation
-#clgeo_Clean has no effect - deals with coordinates precision
+# TESTS TO INVESTIGATE FURTHER
+#------------------------------
+
+#Dangling edges - clgeo_Clean has no effect
+#TODO investigate
+test_that("Clean - Dangling edge",{
+  wkt <- "POLYGON((0 0, 10 0, 15 5, 10 0, 10 10, 0 10, 0 0))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_false(gIsValid(sp.clean)) #!!
+})
+
+#hexagonal polygons - clgeo_Clean has no effect - deals with coordinates precision
+#TODO investigate
 test_that("Clean - hexagonal polygons",{
   p1 <- Polygon(cbind(c(1276503.26781119, 1281876.11747031, 1287248.96712942,
                         1287248.96712942, 1281876.11747031, 1276503.26781119,1276503.26781119),
@@ -192,6 +196,6 @@ test_that("Clean - hexagonal polygons",{
   sp <- SpatialPolygons(list(Polygons(list(p1, p2, p3), 's1')))
   sp.clean <- clgeo_Clean(sp)
   expect_false(gIsValid(sp))
-  expect_false(gIsValid(sp.clean))
+  expect_false(gIsValid(sp.clean)) #!!
   
 })
