@@ -139,7 +139,7 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
 #' @author
 #' Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
-#' @param polygons object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp}
+#' @param p object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp}
 #' @return an object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
