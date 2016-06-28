@@ -104,17 +104,18 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           }
           if(strategy == "POLYGONATION"){
             polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
+            
           }else if(strategy == "BUFFER"){
             attempt <- 1
-            polygon <- gBuffer(polygon, id = ID, width = 0)
-            while(attempt < 3){
-              if(!gIsValid(polygon)){
-                attempt <- attempt + 1
-                polygon <- gBuffer(polygon, id = ID, width = 0)
-              }else{
-                break;
-              }
-            }
+  		      polygon <- gBuffer(polygon, id = ID, width = 0)
+  		      while(attempt < 3){
+  			      if(!gIsValid(polygon)){
+  				      attempt <- attempt + 1
+        				polygon <- gBuffer(polygon, id = ID, width = 0)
+  			      }else{
+  				      break;
+  			      }
+  		      }
           }
         }
         if(!is.null(polygon)){
