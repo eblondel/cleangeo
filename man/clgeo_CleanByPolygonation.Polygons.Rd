@@ -7,7 +7,7 @@
 clgeo_CleanByPolygonation.Polygons(p)
 }
 \arguments{
-\item{polygons}{object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp}}
+\item{p}{object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp}}
 }
 \value{
 an object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp},
