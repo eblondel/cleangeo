@@ -21,8 +21,6 @@ This short document shows you how to inspect spatial objects, and clean them wit
 devtools::install_github("eblondel/cleangeo")
 ```
 
-It is planned to publish soon ``cleangeo`` to CRAN.
-
 ## Load cleangeo
 
 To load the package in R, do the following:
