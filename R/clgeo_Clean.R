@@ -17,7 +17,9 @@
 #' for which the output should bounded. Default value is NULL (\emph{i.e.} the output
 #' will include features for which both errors and errors were raised.). At now, this
 #' argument accepts the error type \code{"ORPHANED_HOLE"}.
-#' @param print.log Indicates wether the clean logs have to be printed. Default 
+#' @param strategy advanced strategy to clean geometries. Default is "POLYGONATION",
+#'        alternate value is "BUFFER" (old method).
+#' @param verbose Indicates wether the clean logs have to be printed. Default 
 #' value is FALSE.
 #' @return an object extending the \code{\link[sp]{Spatial-class}}
 #' as defined in \pkg{sp}, with cleaned geometries.
@@ -35,8 +37,20 @@
 #' 
 #' @keywords geometry validity summary clean
 #' 
+#' @note About cleaning strategy:
+#' The polygonation method is a tentative alternate method to triangulation to clean
+#' geometries and to the classical often used 'buffer' approach. In the polygonation
+#' method, triangulation is skipped and a re-polygonation intuitive algorithm is 
+#' applied to rebuild the source invalid geometry into one or more valid polygonal
+#' geometries.
+#' 
 #'
-clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
+clgeo_Clean <- function(sp, errors.only = NULL,
+                        strategy = "POLYGONATION",
+                        verbose = FALSE){
+  
+  if(!(strategy %in% c("POLYGONATION", "BUFFER")))
+     stop("Unknown advanced cleaning method. Accepted values: 'POLYGONATION', 'BUFFER'")
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
@@ -57,7 +71,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
             if(slot(polygons[[i]], "hole")
                & dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
               
-              if(removedHoles == 0 & print.log){
+              if(removedHoles == 0 & verbose){
                 print(paste("Cleaning orphaned holes at index ", x, sep=""))
               }
               
@@ -72,7 +86,7 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
         #testing validity after removing holes
         isValid <- report[x,]$valid
         if(removedHoles > 0){
-          if(print.log){
+          if(verbose){
             print(paste("Checking geometry validity at index ", x, sep=""))
           }
           
@@ -83,16 +97,29 @@ clgeo_Clean <- function(sp, errors.only = NULL, print.log = FALSE){
         
         #test clean geometry validity
         if(is.null(errors.only) & !isValid){
-          if(print.log){
+          if(verbose){
             print(paste("Cleaning geometry at index ", x, sep=""))
           }
-          polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
+          if(strategy == "POLYGONATION"){
+            polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
+          }else if(strategy == "BUFFER"){
+            attempt <- 1
+            polygon <- gBuffer(polygon, id = ID, width = 0)
+            while(attempt < 3){
+              if(!gIsValid(polygon)){
+                attempt <- attempt + 1
+                polygon <- gBuffer(polygon, id = ID, width = 0)
+              }else{
+                break;
+              }
+            }
+          }
         }
         if(!is.null(polygon)){
           polygon <- polygon@polygons[[1]]
           slot(polygon, "ID") <- ID #index integrity
         }else{
-          if(print.log){
+          if(verbose){
             print(paste("Removing false polygon at index ", x, sep=""))
           }
         }

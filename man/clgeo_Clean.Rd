@@ -4,7 +4,8 @@
 \alias{clgeo_Clean}
 \title{clgeo_Clean}
 \usage{
-clgeo_Clean(sp, errors.only = NULL, print.log = FALSE)
+clgeo_Clean(sp, errors.only = NULL, strategy = "POLYGONATION",
+  verbose = FALSE)
 }
 \arguments{
 \item{sp}{object extending the \code{\link[sp]{Spatial-class}}
@@ -15,7 +16,10 @@ for which the output should bounded. Default value is NULL (\emph{i.e.} the outp
 will include features for which both errors and errors were raised.). At now, this
 argument accepts the error type \code{"ORPHANED_HOLE"}.}
 
-\item{print.log}{Indicates wether the clean logs have to be printed. Default
+\item{strategy}{advanced strategy to clean geometries. Default is "POLYGONATION",
+alternate value is "BUFFER" (old method).}
+
+\item{verbose}{Indicates wether the clean logs have to be printed. Default
 value is FALSE.}
 }
 \value{
@@ -24,6 +28,14 @@ as defined in \pkg{sp}, with cleaned geometries.
 }
 \description{
 Function to clean a spatial data collection
+}
+\note{
+About cleaning strategy:
+The polygonation method is a tentative alternate method to triangulation to clean
+geometries and to the classical often used 'buffer' approach. In the polygonation
+method, triangulation is skipped and a re-polygonation intuitive algorithm is
+applied to rebuild the source invalid geometry into one or more valid polygonal
+geometries.
 }
 \examples{
 require(maptools)

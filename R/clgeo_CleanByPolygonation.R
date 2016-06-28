@@ -72,60 +72,87 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
   
   #util function to build line
   buildLine <- function(start.coords, end.coords){
-    coords <- rbind(start.coords, end.coords)
-    out <- SpatialLines(list(Lines(slinelist = list(Line(coords)), ID = "1")))
-    return(out)
+    coords <- rbind(start.coords, end.coords); colnames(coords) <- c("x","y");
+    return(SpatialLines(list(Lines(slinelist = list(Line(coords)), ID = "1"))))
   }
+  
+  #util function to calculate slope
+  slope <- function(line, abs = TRUE){
+    xy <- slot(slot(line,"lines")[[1]],"Lines")[[1]]@coords
+    slp <- (xy[2,1]-xy[1,1]) / (xy[2,2]-xy[1,2])
+    if(abs) slp <- abs(slp)
+    return(slp)
+  }
+  
+  combinedLines <- function(edge, spNewLines){
+    iscomb <- FALSE
+    for(i in 1:length(spNewLines)){
+      if(slope(edge) == slope(spNewLines[[i]]))
+        iscomb <- gIntersects(edge, spNewLines[[i]])
+        if(iscomb) break;
+    }
+    return(iscomb)
+  }
+  
+  #all
+  #sequence all coords but with lapply, starting with coords of the line after
+  all.coords <- lapply(2:length(spNewLines),function(i){
+    line.seq <- 1:length(spNewLines)
+    start <- which(line.seq == i)
+    line.seq <- c(start:max(line.seq))
+    if(start != 1) line.seq <- c(line.seq,1:(start-1))
+    out <- do.call("rbind",
+      lapply(line.seq,
+       function(x){
+          l.coords <- slot(slot(spNewLines[[x]],"lines")[[1]],"Lines")[[1]]@coords
+          l.coords<- l.coords[1:(nrow(l.coords)-1),]
+          if(class(l.coords) != "matrix"){
+            l.coords <- data.frame(
+              x = l.coords[1],
+              y = l.coords[2],
+              intersect = FALSE,
+              stringsAsFactors = FALSE
+            )
+          }else{
+            l.coords <- data.frame(
+              x = l.coords[,1],
+              y = l.coords[,2],
+              intersect = c(FALSE,rep(TRUE,nrow(l.coords)-1)),
+              stringsAsFactors = FALSE
+            )
+          }
+          return(l.coords)
+       }))
+    return(out)
+  })
   
   #try create polygons (skipping raw triangulation)
   pol.pts <- NULL
   polygons <- lapply(2:length(spNewLines),function(i){
     
-    #before
+    #start coords
     before <- i-1
     lineBefore <- spNewLines[[before]]
     start.coords <- tail(slot(slot(lineBefore,"lines")[[1]],"Lines")[[1]]@coords,n = 2)[1,]
     
-    #all
-    #sequence all coords but with lapply, starting with coords of lineAfter
-    line.seq <- 1:length(spNewLines)
-    after <- i
-    if(after > length(spNewLines)) after <- after - length(spNewLines)
-    start <- which(line.seq == after)
-    end <- length(line.seq)
-    line.seq <- c(start:end)
-    if(start != 1) line.seq <- c(line.seq,1:(start-1))
-    all.coords <- do.call("rbind",lapply(line.seq,
-                                         function(x){
-                                           l.coords <- slot(slot(spNewLines[[x]],"lines")[[1]],"Lines")[[1]]@coords
-                                           out <- l.coords[1:(nrow(l.coords)-1),]
-                                           return(out)
-                                         }))
-    
-    ncoords <- 2
-    #lineAfter <- spNewLines[[after]]
-    #lineAfterBis <- lineAfter
-    end.coords <- head(all.coords, n = ncoords)[ncoords,]
-    edge <- buildLine(start.coords, end.coords)
-    edge.touch <- any(sapply(1:length(spNewLines), function(x){
-      return(class(gIntersection(edge,spNewLines[[x]])) == "SpatialLines")
-    }))
-    while(!edge.touch){
-      ncoords <- ncoords + 1
-      end.coords <- head(all.coords, n = ncoords)[ncoords,]
-      edge <- buildLine(start.coords, end.coords)
-      edge.touch <- any(sapply(1:length(spNewLines), function(x){
-        return(class(gIntersection(edge,spNewLines[[x]])) == "SpatialLines")
-      }))
+    #end coords
+    allcoords <- all.coords[[i-1]]
+    ncoords <- which(allcoords$intersect)
+    if(length(ncoords) > 0){
+      end.coords <- allcoords[1:(ncoords[1]),1:2]
+    }else{
+      end.coords <- allcoords[,1:2]
     }
     
-    pol <- Polygon(rbind(start.coords, all.coords[1:ncoords,]), hole = FALSE)
-    cen <- slot(pol, "labpt")
+    #polygon
+    pol <- Polygon(rbind(start.coords, end.coords), hole = FALSE)
+    cen <- as.character(slot(pol, "labpt"))
+    out.pol <- NULL
     if(!all(cen %in% pol.pts)){
       pol.pts <<- rbind(pol.pts, cen)
-      return(pol)
+      out.pol <- pol
     }
-    
+    return(out.pol)
   })
   polygons <- polygons[!sapply(polygons,is.null)]
   return(polygons)
@@ -160,6 +187,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
   
   trsp <- SpatialPolygons(Srl = lapply(1:length(polygons), function(i){
     po <- clgeo_CleanByPolygonation.Polygon(polygons[[i]])
+    
     if(!is.list(po)) po <- list(po)
     poly <- Polygons(srl = po, ID = as.character(i))
     return(poly)
