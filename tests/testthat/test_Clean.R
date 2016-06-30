@@ -171,7 +171,7 @@ test_that("Clean - Dangling edge",{
   sp <- rgeos::readWKT(wkt)
   sp.clean <- clgeo_Clean(sp)
   expect_false(gIsValid(sp))
-  expect_false(gIsValid(sp.clean)) #!!
+  expect_true(gIsValid(sp.clean))
 })
 
 # TESTS TO INVESTIGATE FURTHER
