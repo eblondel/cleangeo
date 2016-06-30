@@ -70,36 +70,40 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
     })
   )
   
-  #all
-  #sequence all coords but with lapply, starting with coords of the line after
-  all.coords <- lapply(2:length(spNewLines),function(i){
+  #getAllCoords for a line index
+  getAllCoords <- function(i){
     line.seq <- 1:length(spNewLines)
     start <- which(line.seq == i)
     line.seq <- c(start:max(line.seq))
     if(start != 1) line.seq <- c(line.seq,1:(start-1))
     out <- do.call("rbind",
-      lapply(line.seq,
-       function(x){
-          l.coords <- slot(slot(spNewLines[[x]],"lines")[[1]],"Lines")[[1]]@coords
-          l.coords<- l.coords[1:(nrow(l.coords)-1),]
-          if(class(l.coords) != "matrix"){
-            l.coords <- data.frame(
-              x = l.coords[1],
-              y = l.coords[2],
-              intersect = FALSE,
-              stringsAsFactors = FALSE
-            )
-          }else{
-            l.coords <- data.frame(
-              x = l.coords[,1],
-              y = l.coords[,2],
-              intersect = c(FALSE,rep(TRUE,nrow(l.coords)-1)),
-              stringsAsFactors = FALSE
-            )
-          }
-          return(l.coords)
-       }))
+                   lapply(line.seq,
+                          function(x){
+                            l.coords <- slot(slot(spNewLines[[x]],"lines")[[1]],"Lines")[[1]]@coords
+                            l.coords<- l.coords[1:(nrow(l.coords)-1),]
+                            if(class(l.coords) != "matrix"){
+                              l.coords <- data.frame(
+                                x = l.coords[1],
+                                y = l.coords[2],
+                                intersect = FALSE,
+                                stringsAsFactors = FALSE
+                              )
+                            }else{
+                              l.coords <- data.frame(
+                                x = l.coords[,1],
+                                y = l.coords[,2],
+                                intersect = c(FALSE,rep(TRUE,nrow(l.coords)-1)),
+                                stringsAsFactors = FALSE
+                              )
+                            }
+                            return(l.coords)
+                          }))
     return(out)
+  }
+  
+  #sequence all coords but with lapply, starting with coords of the line after
+  all.coords <- lapply(2:length(spNewLines),function(i){
+    out <- getAllCoords(i);
   })
   
   #try create polygons (skipping raw triangulation)

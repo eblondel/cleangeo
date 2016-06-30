@@ -165,11 +165,7 @@ test_that("Clean - Multiple nested polygon",{
   expect_true(gIsValid(sp.clean))
 })
 
-# TESTS TO INVESTIGATE FURTHER
-#------------------------------
-
-#Dangling edges - clgeo_Clean has no effect
-#TODO investigate
+#validation is OK (managed by cleangeo)
 test_that("Clean - Dangling edge",{
   wkt <- "POLYGON((0 0, 10 0, 15 5, 10 0, 10 10, 0 10, 0 0))"
   sp <- rgeos::readWKT(wkt)
@@ -177,6 +173,10 @@ test_that("Clean - Dangling edge",{
   expect_false(gIsValid(sp))
   expect_false(gIsValid(sp.clean)) #!!
 })
+
+# TESTS TO INVESTIGATE FURTHER
+#------------------------------
+
 
 #hexagonal polygons - clgeo_Clean has no effect - deals with coordinates precision
 #TODO investigate

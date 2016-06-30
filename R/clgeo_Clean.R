@@ -103,9 +103,14 @@ clgeo_Clean <- function(sp, errors.only = NULL,
             print(paste("Cleaning geometry at index ", x, sep=""))
           }
           if(strategy == "POLYGONATION"){
+            #run polygonation algorithm
             polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
             
+            #remove dangling edges
+            polygon <- gBuffer(polygon, id = ID, width = 0) 
+            
           }else if(strategy == "BUFFER"){
+            #try applying buffer attemps
             attempt <- 1
   		      polygon <- gBuffer(polygon, id = ID, width = 0)
   		      while(attempt < 3){
