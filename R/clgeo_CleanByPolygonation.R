@@ -167,19 +167,35 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
                                          })]
   
   new.polygons <- lapply(1:length(polygons), function(i){
-    po <- clgeo_CleanByPolygonation.Polygon(polygons[[i]])
     
+    polygon <- polygons[[i]]
+    tempsp <- SpatialPolygons(Srl = list(Polygons(srl=list(polygon),ID="1")))
+    po <- polygon
+    if(!gIsValid(tempsp)){
+      po <- clgeo_CleanByPolygonation.Polygon(polygon)
+    }
     if(!is.list(po)) po <- list(po)
+    po<- lapply(po, function(x){
+      outpo <- x
+      if(nrow(unique(slot(x,"coords"))) < 3) outpo <- NULL
+      return(outpo)
+    })
+    po <- po[!sapply(po,is.null)]
     
     out <- NULL
-    poly <- Polygons(srl = po, ID = as.character(i))
-    if(slot(poly, "area") > 0) out <- poly
+    if(!is.null(po) && length(po) > 0){
+      poly <- Polygons(srl = po, ID = as.character(i))
+      if(slot(poly, "area") > 0) out <- poly
+      if(!is.null(out)){
+        if(is.null(gBuffer(SpatialPolygons(Srl = list(out)), width=0))) out <- NULL
+      }
+    }
     return(out)
   })
   new.polygons <- new.polygons[!sapply(new.polygons,is.null)]
   trsp <- SpatialPolygons(Srl = new.polygons)
   trsp <- gUnionCascaded(trsp, sapply(trsp@polygons, slot, "ID"))
-  trsp <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
+  #trsp <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
   
   #holes
   holes <- slot(p, "Polygons")[sapply(slot(p,"Polygons"), slot, "hole")]
@@ -191,17 +207,38 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
     })
     
     new.holes <- lapply(1:length(holes), function(i){
-      po <- clgeo_CleanByPolygonation.Polygon(holes[[i]])
+      hole <- holes[[i]]
+      temphole <- SpatialPolygons(Srl = list(Polygons(srl=list(hole),ID="1")))
+      po <- hole
+      if(!gIsValid(temphole)){
+        po <- clgeo_CleanByPolygonation.Polygon(hole)
+      }
       if(!is.list(po)) po <- list(po)
+      po<- lapply(po, function(x){
+        outpo <- x
+        coords <- slot(x,"coords")
+        coords[,1] <- as.character(coords[,1])
+        coords[,2] <- as.character(coords[,2])
+        if(nrow(unique(slot(x,"coords"))) < 3) outpo <- NULL
+        return(outpo)
+      })
+      po <- po[!sapply(po,is.null)]
+      
       out <- NULL
-      polyholes <- Polygons(srl = po, ID = as.character(i))
-      if(slot(polyholes, "area") > 0) out <- polyholes
+      if(!is.null(po) && length(po) > 0){
+        if(!is.list(po)) po <- list(po)
+        polyholes <- Polygons(srl = po, ID = as.character(i))
+        if(slot(polyholes, "area") > 0) out <- polyholes
+        if(!is.null(out)){
+          if(is.null(gBuffer(SpatialPolygons(Srl = list(out)), width=0))) out <- NULL
+        }
+      }
       return(out)
     })
     new.holes <- new.holes[!sapply(new.holes,is.null)]
     trspholes <- SpatialPolygons(Srl = new.holes)
     trspholes <- gUnionCascaded(trspholes, sapply(trspholes@polygons, slot, "ID"))
-    trspholes <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
+    #trspholes <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
     slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
     
     #difference
