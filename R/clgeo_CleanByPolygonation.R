@@ -71,22 +71,19 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
     })
   )
   
-  #getAllCoords for a line index
-  getAllCoords <- function(i){
-    line.seq <- 1:length(spNewLines)
-    start <- which(line.seq == i)
-    line.seq <- c(start:max(line.seq))
-    if(start != 1) line.seq <- c(line.seq,1:(start-1))
+  #getAllCoords
+  getAllCoords <- function(){
     out <- do.call("rbind",
-                   lapply(line.seq,
-                          function(x){
-                            l.coords <- slot(slot(spNewLines[[x]],"lines")[[1]],"Lines")[[1]]@coords
+                   lapply(spNewLines,
+                          function(i){
+                            l.coords <- slot(slot(i,"lines")[[1]],"Lines")[[1]]@coords
                             l.coords<- l.coords[1:(nrow(l.coords)-1),]
                             if(class(l.coords) != "matrix"){
                               l.coords <- data.frame(
                                 x = l.coords[1],
                                 y = l.coords[2],
                                 intersect = FALSE,
+                                linestart = TRUE,
                                 stringsAsFactors = FALSE
                               )
                             }else{
@@ -94,48 +91,45 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
                                 x = l.coords[,1],
                                 y = l.coords[,2],
                                 intersect = c(FALSE,rep(TRUE,nrow(l.coords)-1)),
+                                linestart = c(TRUE,rep(FALSE,nrow(l.coords)-1)),
                                 stringsAsFactors = FALSE
                               )
                             }
                             return(l.coords)
                           }))
+    row.names(out) <- 1:nrow(out)
     return(out)
   }
   
-  #sequence all coords but with lapply, starting with coords of the line after
-  all.coords <- lapply(2:length(spNewLines),function(i){
-    out <- getAllCoords(i);
-  })
   
-  #try create polygons (skipping raw triangulation)
-  pol.pts <- NULL
-  polygons <- lapply(2:length(spNewLines),function(i){
-    
-    #start coords
-    before <- i-1
-    lineBefore <- spNewLines[[before]]
-    start.coords <- tail(slot(slot(lineBefore,"lines")[[1]],"Lines")[[1]]@coords,n = 2)[1,]
-    
-    #end coords
-    allcoords <- all.coords[[i-1]]
-    ncoords <- which(allcoords$intersect)
-    if(length(ncoords) > 0){
-      end.coords <- allcoords[1:(ncoords[1]),1:2]
-    }else{
-      end.coords <- allcoords[,1:2]
-    }
-    
-    #polygon
-    pol <- Polygon(rbind(start.coords, end.coords), hole = FALSE)
-    cen <- as.character(slot(pol, "labpt"))
-    out.pol <- NULL
-    if(!all(cen %in% pol.pts)){
-      pol.pts <<- rbind(pol.pts, cen)
-      out.pol <- pol
-    }
-    return(out.pol)
-  })
+  #sequence all coords but with lapply, starting with coords of the line after
+  cc <- getAllCoords()
+  ncoords <- which(cc$intersect)
+  if(length(ncoords) > 0){
+    polygons <- lapply(1:length(ncoords),function(i){
+      coords <- NULL
+      if(i<length(ncoords)){
+        coords <- cc[ncoords[i]:ncoords[i+1],1:2]
+      }else{
+        coords <- rbind(cc[ncoords[i]:nrow(cc),1:2],cc[1:ncoords[1],1:2])
+      }
+      out <- NULL
+      if(!is.null(coords)) out <- Polygon(coords, hole=FALSE)
+      return(out)
+    })
+  }else{
+    polygons <- list(Polygon(cc[,1:2],hole=FALSE))
+  }
   polygons <- polygons[!sapply(polygons,is.null)]
+  polygons <- polygons[sapply(polygons, function(x){return(slot(x,"area") > (1/rgeos::getScale()))})]
+  
+  #manage dangling edges (TODO investigate an easier way)
+  if(length(polygons)>0){
+    temp.poly <- SpatialPolygons(Srl=list(Polygons(srl=polygons,ID="1")))
+    temp.polygon <- gBuffer(temp.poly, width=0)
+    polygons <- temp.polygon@polygons[[1]]@Polygons
+  }
+  
   return(polygons)
 }
 
@@ -166,6 +160,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
                                            return(!slot(x,"hole"))
                                          })]
   
+  ID <- 1
   new.polygons <- lapply(1:length(polygons), function(i){
     
     polygon <- polygons[[i]]
@@ -184,18 +179,23 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
     
     out <- NULL
     if(!is.null(po) && length(po) > 0){
-      poly <- Polygons(srl = po, ID = as.character(i))
+      poly <- Polygons(srl = po, ID = as.character(ID))
       if(slot(poly, "area") > 0) out <- poly
       if(!is.null(out)){
-        if(is.null(gBuffer(SpatialPolygons(Srl = list(out)), width=0))) out <- NULL
+        if(slot(poly,"area") >= (1/rgeos::getScale())){
+          ID <<- ID + 1
+        }else{
+          out <- NULL
+        }
       }
     }
     return(out)
   })
   new.polygons <- new.polygons[!sapply(new.polygons,is.null)]
+  if(length(new.polygons)==0) return(new.polygons)
   trsp <- SpatialPolygons(Srl = new.polygons)
   trsp <- gUnionCascaded(trsp, sapply(trsp@polygons, slot, "ID"))
-  #trsp <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
+  trsp <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
   
   #holes
   holes <- slot(p, "Polygons")[sapply(slot(p,"Polygons"), slot, "hole")]
@@ -227,22 +227,33 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
       out <- NULL
       if(!is.null(po) && length(po) > 0){
         if(!is.list(po)) po <- list(po)
-        polyholes <- Polygons(srl = po, ID = as.character(i))
+        polyholes <- Polygons(srl = po, ID = as.character(ID))
         if(slot(polyholes, "area") > 0) out <- polyholes
         if(!is.null(out)){
-          if(is.null(gBuffer(SpatialPolygons(Srl = list(out)), width=0))) out <- NULL
+          if(slot(polyholes,"area") >= (1/rgeos::getScale())){
+            ID <<- ID + 1
+          }else{  
+            out <- NULL
+          }
         }
       }
       return(out)
     })
     new.holes <- new.holes[!sapply(new.holes,is.null)]
-    trspholes <- SpatialPolygons(Srl = new.holes)
-    trspholes <- gUnionCascaded(trspholes, sapply(trspholes@polygons, slot, "ID"))
-    #trspholes <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
-    slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
+    if(length(new.holes)>0){
+      trspholes <- SpatialPolygons(Srl = new.holes)
+      trspholes <- gUnionCascaded(trspholes, sapply(trspholes@polygons, slot, "ID"))
+      trspholes <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
+      slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
     
-    #difference
-    spout <- gDifference(trsp, trspholes)
+      #difference
+      spout <- gDifference(trsp, trspholes)
+      spout <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(spout@polygons, slot, "Polygons")), ID = "1")))
+      slot(spout, "polygons") <- lapply(slot(spout, "polygons"), checkPolygonsHoles)
+    }else{
+      spout <- trsp
+    } 
+   
   }else{
     spout <- trsp
   }

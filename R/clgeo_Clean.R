@@ -64,22 +64,30 @@ clgeo_Clean <- function(sp, errors.only = NULL,
       if(x %in% nv){          
         polygons <- slot(polygon, "Polygons")
         poly.nb <- length(polygons)
-        removedHoles <- 0
+        removedHoles <- vector()
         
         if(poly.nb > 0){
-          newpolygons <- polygons
+          newpolygons <- list()
           for(i in 1:poly.nb){
             #if we found an orphaned hole, we remove it
-            if(slot(polygons[[i]], "hole")
-               & dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
-              
-              if(removedHoles == 0 & verbose){
-                print(paste("Cleaning orphaned holes at index ", x, sep=""))
+            if(slot(polygons[[i]], "hole")){
+              if(dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
+                
+                if(length(removedHoles) == 0 & verbose){
+                  print(paste("Cleaning orphaned holes at index ", x, sep=""))
+                }
+                removedHoles <- c(removedHoles, i)
+              }else{
+                newpolygon <- polygons[[i]]
+                slot(newpolygon, "hole") <- TRUE
+                newpolygons <- c(newpolygons, newpolygon)
               }
-              
-              newpolygons[[i - removedHoles]] <- NULL
-              removedHoles <- removedHoles + 1
+            }else{
+              newpolygon <- polygons[[i]]
+              slot(newpolygon, "hole") <- FALSE
+              newpolygons <- c(newpolygons, newpolygon)
             }
+            
           }
           slot(polygon, "Polygons") <- newpolygons
         }
@@ -87,14 +95,18 @@ clgeo_Clean <- function(sp, errors.only = NULL,
         
         #testing validity after removing holes
         isValid <- report[x,]$valid
-        if(removedHoles > 0){
+        if(length(removedHoles) > 0){
           if(verbose){
             print(paste("Checking geometry validity at index ", x, sep=""))
           }
           
-          slot(polygon, "polygons") <- lapply(slot(polygon, "polygons"),
-                                              checkPolygonsHoles)
-          isValid <- gIsValid(polygon)
+          tryCatch({
+            slot(polygon, "polygons") <<- lapply(slot(polygon, "polygons"), checkPolygonsHoles)
+          },error = function(err){invisible(err)})
+          
+          tryCatch({
+            isValid <<- gIsValid(polygon)
+          },error=function(err){invisible(err)})
         }
         
         #test clean geometry validity
@@ -106,11 +118,8 @@ clgeo_Clean <- function(sp, errors.only = NULL,
             #run polygonation algorithm
             polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
             
-            #remove dangling edges
-            polygon <- gBuffer(polygon, id = ID, width = 0) 
-            
           }else if(strategy == "BUFFER"){
-            #try applying buffer attemps
+            #try applying buffer attempts
             attempt <- 1
   		      polygon <- gBuffer(polygon, id = ID, width = 0)
   		      while(attempt < 3){
