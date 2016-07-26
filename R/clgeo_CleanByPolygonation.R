@@ -249,7 +249,6 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
       #difference
       spout <- gDifference(trsp, trspholes)
       spout <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(spout@polygons, slot, "Polygons")), ID = "1")))
-      slot(spout, "polygons") <- lapply(slot(spout, "polygons"), checkPolygonsHoles)
     }else{
       spout <- trsp
     } 

@@ -174,9 +174,24 @@ test_that("Clean - Dangling edge",{
   expect_true(gIsValid(sp.clean))
 })
 
+test_that("Clean - false holes - case 1",{
+  wkt <- "POLYGON((0 0, 0 10, 10 10, 10 5, 5 5, 5 7, 3 7, 3 5, 5 5, 5 0, 0 0))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
+})
+
+test_that("Clean - false holes - case 2",{
+  wkt <- "POLYGON((0 0, 0 10, 10 10, 10 5, 3 5, 3 7, 5 7, 5 0, 0 0))"
+  sp <- rgeos::readWKT(wkt)
+  sp.clean <- clgeo_Clean(sp)
+  expect_false(gIsValid(sp))
+  expect_true(gIsValid(sp.clean))
+})
+
 # TESTS TO INVESTIGATE FURTHER
 #------------------------------
-
 
 #hexagonal polygons - clgeo_Clean has no effect - deals with coordinates precision
 #TODO investigate
