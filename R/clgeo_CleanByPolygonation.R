@@ -12,6 +12,7 @@
 #' Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
 #' @param p object of class \code{\link[sp]{Polygon-class}} as defined in \pkg{sp}
+#' @param verbose Indicates wether the clean logs have to be printed. Default value is FALSE.
 #' @return a list of objects of class \code{\link[sp]{Polygon-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
@@ -23,7 +24,7 @@
 #' applied.
 #'
 #' 
-clgeo_CleanByPolygonation.Polygon <- function(p){
+clgeo_CleanByPolygonation.Polygon <- function(p, verbose = FALSE){
   pts <-  as.data.frame(p@coords)
   linesList <- lapply(1:(nrow(pts)-1),function(i){Line(pts[i:(i+1),])})
   
@@ -149,6 +150,7 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
 #' Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
 #' @param p object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp}
+#' @param verbose Indicates wether the clean logs have to be printed. Default value is FALSE.
 #' @return an object of class \code{\link[sp]{Polygons-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
@@ -159,7 +161,7 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
 #' geometries. In this method, triangulation is skipped and a re-polygonation algorithm is
 #' applied.
 #' 
-clgeo_CleanByPolygonation.Polygons <- function(p){
+clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
   
   #not holes
   polygons <- slot(p, "Polygons")[sapply(slot(p,"Polygons"),
@@ -174,8 +176,16 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
     polygon <- polygons[[i]]
     tempsp <- SpatialPolygons(Srl = list(Polygons(srl=list(polygon),ID="1")))
     po <- polygon
-    if(!gIsValid(tempsp)){
-      po <- clgeo_CleanByPolygonation.Polygon(polygon)
+    
+    isValid <- NULL
+    if(verbose){ 
+      isValid <- gIsValid(tempsp)
+    } else {
+      isValid <- suppressWarnings(gIsValid(tempsp))
+    }
+    
+    if(!isValid){
+      po <- clgeo_CleanByPolygonation.Polygon(polygon, verbose)
     }
     if(!is.null(po)){
       if(!is.list(po)) po <- list(po)
@@ -220,8 +230,16 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
       hole <- holes[[i]]
       temphole <- SpatialPolygons(Srl = list(Polygons(srl=list(hole),ID="1")))
       po <- hole
-      if(!gIsValid(temphole)){
-        po <- clgeo_CleanByPolygonation.Polygon(hole)
+      
+      isValid <- NULL
+      if(verbose){ 
+        isValid <- gIsValid(temphole)
+      } else {
+        isValid <- suppressWarnings(gIsValid(temphole))
+      }
+      
+      if(!isValid){
+        po <- clgeo_CleanByPolygonation.Polygon(hole, verbose)
       }
       if(!is.list(po)) po <- list(po)
       po<- lapply(po, function(x){
@@ -279,6 +297,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
 #' Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
 #' @param sp object extending the \code{\link[sp]{Spatial-class}} as defined in \pkg{sp}
+#' @param verbose Indicates wether the clean logs have to be printed. Default value is FALSE.
 #' @return an object extending the \code{\link[sp]{Spatial-class}} as defined in \pkg{sp},
 #' with cleaned geometries.
 #'
@@ -289,8 +308,8 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
 #' geometries. In this method, triangulation is skipped and a re-polygonation algorithm is
 #' applied.
 #' 
-clgeo_CleanByPolygonation.SpatialPolygons <- function(sp){
-  polygons <- unlist(lapply(sp@polygons, clgeo_CleanByPolygonation.Polygons))
+clgeo_CleanByPolygonation.SpatialPolygons <- function(sp, verbose = FALSE){
+  polygons <- unlist(lapply(sp@polygons, clgeo_CleanByPolygonation.Polygons, verbose))
   spout <- SpatialPolygons(Srl = polygons)
   return(spout)
 }

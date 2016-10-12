@@ -5,10 +5,12 @@
 \alias{clgeo_CleanByTriangulation}
 \title{clgeo_CleanByPolygonation.SpatialPolygons}
 \usage{
-clgeo_CleanByPolygonation.SpatialPolygons(sp)
+clgeo_CleanByPolygonation.SpatialPolygons(sp, verbose = FALSE)
 }
 \arguments{
 \item{sp}{object extending the \code{\link[sp]{Spatial-class}} as defined in \pkg{sp}}
+
+\item{verbose}{Indicates wether the clean logs have to be printed. Default value is FALSE.}
 }
 \value{
 an object extending the \code{\link[sp]{Spatial-class}} as defined in \pkg{sp},

@@ -74,7 +74,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
               if(dim(unique(slot(polygons[[i]], "coords")))[1] < 3){
                 
                 if(length(removedHoles) == 0 & verbose){
-                  print(paste("Cleaning orphaned holes at index ", x, sep=""))
+                  logger.info(sprintf("Cleaning orphaned holes at index %s", x))
                 }
                 removedHoles <- c(removedHoles, i)
               }else{
@@ -97,7 +97,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
         isValid <- report[x,]$valid
         if(length(removedHoles) > 0){
           if(verbose){
-            print(paste("Checking geometry validity at index ", x, sep=""))
+            logger.info(sprintf("Checking geometry validity at index %s", x))
           }
           
           tryCatch({
@@ -112,11 +112,17 @@ clgeo_Clean <- function(sp, errors.only = NULL,
         #test clean geometry validity
         if(is.null(errors.only) & !isValid){
           if(verbose){
-            print(paste("Cleaning geometry at index ", x, sep=""))
+            report.msg <- NULL
+            if(!is.na(report[x,"error_msg"])){
+              report.msg <- report[x,"error_msg"]
+            }else if(!is.na(report[x,"warning_msg"])){
+              report.msg <- report[x,"warning_msg"]
+            }
+            logger.info(sprintf("Cleaning geometry at index %s (%s)", x, report.msg))
           }
           if(strategy == "POLYGONATION"){
             #run polygonation algorithm
-            polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon)
+            polygon <- clgeo_CleanByPolygonation.SpatialPolygons(polygon, verbose)
             
           }else if(strategy == "BUFFER"){
             #try applying buffer attempts
@@ -137,7 +143,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           slot(polygon, "ID") <- ID #index integrity
         }else{
           if(verbose){
-            print(paste("Removing false polygon at index ", x, sep=""))
+            logger.info(sprintf("Removing false polygon at index %s", x))
           }
         }
       }

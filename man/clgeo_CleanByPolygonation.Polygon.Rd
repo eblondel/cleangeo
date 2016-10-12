@@ -4,10 +4,12 @@
 \alias{clgeo_CleanByPolygonation.Polygon}
 \title{clgeo_CleanByPolygonation.Polygon}
 \usage{
-clgeo_CleanByPolygonation.Polygon(p)
+clgeo_CleanByPolygonation.Polygon(p, verbose = FALSE)
 }
 \arguments{
 \item{p}{object of class \code{\link[sp]{Polygon-class}} as defined in \pkg{sp}}
+
+\item{verbose}{Indicates wether the clean logs have to be printed. Default value is FALSE.}
 }
 \value{
 a list of objects of class \code{\link[sp]{Polygon-class}} as defined in \pkg{sp},

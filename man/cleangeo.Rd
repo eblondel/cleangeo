@@ -15,8 +15,8 @@ of having issues when doing spatial data processing.
 \tabular{ll}{
    Package: \tab cleangeo\cr
    Type: \tab Package\cr
-   Version: \tab 0.2\cr
-   Date: \tab 2016-08-17\cr
+   Version: \tab 0.2-1\cr
+   Date: \tab 2016-10-12\cr
    License: \tab GPL(>=2.0)\cr
    LazyLoad: \tab yes\cr
  }
