@@ -127,8 +127,15 @@ clgeo_CleanByPolygonation.Polygon <- function(p){
   if(length(polygons)>0){
     temp.poly <- SpatialPolygons(Srl=list(Polygons(srl=polygons,ID="1")))
     temp.polygon <- gBuffer(temp.poly, width=0)
-    polygons <- temp.polygon@polygons[[1]]@Polygons
+    if(is.null(temp.polygon)){
+      polygons <- NULL
+    }else{
+      polygons <- temp.polygon@polygons[[1]]@Polygons
+    }
   }
+  
+  #in case polygons is empty list return null
+  if(!is.null(polygons) & length(polygons) == 0) polygons <- NULL
   
   return(polygons)
 }
@@ -163,29 +170,32 @@ clgeo_CleanByPolygonation.Polygons <- function(p){
   ID <- 1
   new.polygons <- lapply(1:length(polygons), function(i){
     
+    out <- NULL
     polygon <- polygons[[i]]
     tempsp <- SpatialPolygons(Srl = list(Polygons(srl=list(polygon),ID="1")))
     po <- polygon
     if(!gIsValid(tempsp)){
       po <- clgeo_CleanByPolygonation.Polygon(polygon)
     }
-    if(!is.list(po)) po <- list(po)
-    po<- lapply(po, function(x){
-      outpo <- x
-      if(nrow(unique(slot(x,"coords"))) < 3) outpo <- NULL
-      return(outpo)
-    })
-    po <- po[!sapply(po,is.null)]
-    
-    out <- NULL
-    if(!is.null(po) && length(po) > 0){
-      poly <- Polygons(srl = po, ID = as.character(ID))
-      if(slot(poly, "area") > 0) out <- poly
-      if(!is.null(out)){
-        if(slot(poly,"area") >= (1/rgeos::getScale())){
-          ID <<- ID + 1
-        }else{
-          out <- NULL
+    if(!is.null(po)){
+      if(!is.list(po)) po <- list(po)
+      po<- lapply(po, function(x){
+        outpo <- x
+        if(nrow(unique(slot(x,"coords"))) < 3) outpo <- NULL
+        return(outpo)
+      })
+      po <- po[!sapply(po,is.null)]
+      
+  
+      if(!is.null(po) && length(po) > 0){
+        poly <- Polygons(srl = po, ID = as.character(ID))
+        if(slot(poly, "area") > 0) out <- poly
+        if(!is.null(out)){
+          if(slot(poly,"area") >= (1/rgeos::getScale())){
+            ID <<- ID + 1
+          }else{
+            out <- NULL
+          }
         }
       }
     }
