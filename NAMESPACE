@@ -9,6 +9,7 @@ export(
  clgeo_CollectionReport,
  clgeo_SummaryReport,
  clgeo_SuspiciousFeatures,
+ clgeo_IsValid,
  clgeo_CleanByPolygonation.Polygon,
  clgeo_CleanByPolygonation.Polygons,
  clgeo_CleanByPolygonation.SpatialPolygons,

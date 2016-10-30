@@ -177,13 +177,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
     tempsp <- SpatialPolygons(Srl = list(Polygons(srl=list(polygon),ID="1")))
     po <- polygon
     
-    isValid <- NULL
-    if(verbose){ 
-      isValid <- gIsValid(tempsp)
-    } else {
-      isValid <- suppressWarnings(gIsValid(tempsp))
-    }
-    
+    isValid <- clgeo_IsValid(tempsp, verbose)
     if(!isValid){
       po <- clgeo_CleanByPolygonation.Polygon(polygon, verbose)
     }
@@ -231,13 +225,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
       temphole <- SpatialPolygons(Srl = list(Polygons(srl=list(hole),ID="1")))
       po <- hole
       
-      isValid <- NULL
-      if(verbose){ 
-        isValid <- gIsValid(temphole)
-      } else {
-        isValid <- suppressWarnings(gIsValid(temphole))
-      }
-      
+      isValid <- clgeo_IsValid(temphole, verbose)
       if(!isValid){
         po <- clgeo_CleanByPolygonation.Polygon(hole, verbose)
       }
@@ -309,7 +297,8 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
 #' applied.
 #' 
 clgeo_CleanByPolygonation.SpatialPolygons <- function(sp, verbose = FALSE){
+  spout <- NULL
   polygons <- unlist(lapply(sp@polygons, clgeo_CleanByPolygonation.Polygons, verbose))
-  spout <- SpatialPolygons(Srl = polygons)
+  if(!is.null(polygons)) spout <- SpatialPolygons(Srl = polygons)
   return(spout)
 }

@@ -190,6 +190,17 @@ test_that("Clean - false holes - case 2",{
   expect_true(gIsValid(sp.clean))
 })
 
+test_that("Clean - false polygons",{
+  sp <- SpatialPolygons(
+    Srl = list(Polygons(
+      srl = list(Polygon(as.matrix(data.frame(x=c(0,10,0),y=c(0,10,0))))),
+      ID="1"
+    ))
+  )
+  sp.clean <- clgeo_Clean(sp, verbose = TRUE)
+  expect_true(is.null(sp.clean))
+})
+
 # TESTS TO INVESTIGATE FURTHER
 #------------------------------
 

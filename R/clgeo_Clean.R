@@ -52,7 +52,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
                         verbose = FALSE){
   
   if(!(strategy %in% c("POLYGONATION", "BUFFER")))
-     stop("Unknown advanced cleaning method. Accepted values: 'POLYGONATION', 'BUFFER'")
+    stop("Unknown advanced cleaning method. Accepted values: 'POLYGONATION', 'BUFFER'")
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
@@ -102,11 +102,13 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           
           tryCatch({
             slot(polygon, "polygons") <<- lapply(slot(polygon, "polygons"), checkPolygonsHoles)
-          },error = function(err){invisible(err)})
+          }, warning = function(msg){
+            if(verbose) logger.info(sprintf("Catched MAPTOOLS warning '%s'",msg))
+          }, error = function(err){
+            if(verbose) logger.info(sprintf("Catched MAPTOOLS error '%s'",msg))
+          })
           
-          tryCatch({
-            isValid <<- gIsValid(polygon)
-          },error=function(err){invisible(err)})
+          isValid <<- clgeo_IsValid(polygon, verbose)
         }
         
         #test clean geometry validity
@@ -129,7 +131,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
             attempt <- 1
   		      polygon <- gBuffer(polygon, id = ID, width = 0)
   		      while(attempt < 3){
-  			      if(!gIsValid(polygon)){
+  			      if(!clgeo_IsValid(polygon, verbose)){
   				      attempt <- attempt + 1
         				polygon <- gBuffer(polygon, id = ID, width = 0)
   			      }else{
