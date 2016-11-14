@@ -105,7 +105,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           }, warning = function(msg){
             if(verbose) logger.info(sprintf("Catched MAPTOOLS warning '%s'",msg))
           }, error = function(err){
-            if(verbose) logger.info(sprintf("Catched MAPTOOLS error '%s'",msg))
+            if(verbose) logger.info(sprintf("Catched MAPTOOLS error '%s'",err))
           })
           
           isValid <<- clgeo_IsValid(polygon, verbose)
