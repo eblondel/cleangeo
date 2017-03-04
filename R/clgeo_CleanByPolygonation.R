@@ -183,6 +183,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
     }
     if(!is.null(po)){
       if(!is.list(po)) po <- list(po)
+      po <- po[!sapply(po,is.null)]  
       po<- lapply(po, function(x){
         outpo <- x
         if(nrow(unique(slot(x,"coords"))) < 3) outpo <- NULL
@@ -230,6 +231,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
         po <- clgeo_CleanByPolygonation.Polygon(hole, verbose)
       }
       if(!is.list(po)) po <- list(po)
+      po <- po[!sapply(po,is.null)]
       po<- lapply(po, function(x){
         outpo <- x
         coords <- slot(x,"coords")
