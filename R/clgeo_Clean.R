@@ -57,7 +57,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
   
-  fixed.sp.list <- lapply(1:length(sp), function(x){
+  fixed.sp.list <- pbapply::pblapply(1:length(sp), function(x){
     polygon <- slot(sp, "polygons")[[x]]
     ID <- slot(polygon, "ID")
     if(!all(is.na(nv))){
