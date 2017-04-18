@@ -9,7 +9,7 @@ Depends:
 Imports:
     methods, sp
 Suggests:
-    testthat, knitr
+    testthat, knitr, pbapply
 Description:
   Provides a set of utility tools to inspect spatial objects, facilitate
   handling and reporting of topology errors and geometry validity issues.
