@@ -36,6 +36,6 @@ test_that("clgeo_IsValid - error",{
         ID="1"
     ))
   )
-  expect_error(gIsValid(sp))
+  expect_warning(gIsValid(sp))
   expect_false(clgeo_IsValid(sp, verbose = TRUE))
 })
