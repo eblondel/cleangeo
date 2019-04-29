@@ -3,6 +3,7 @@ cleangeo
 
 [![Build Status](https://travis-ci.org/eblondel/cleangeo.svg?branch=master)](https://travis-ci.org/eblondel/cleangeo)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cleangeo)](https://cran.r-project.org/package=cleangeo)
+[![cran checks](https://cranchecks.info/badges/worst/cleangeo)](https://cran.r-project.org/web/checks/check_results_cleangeo.html)
 [![Github_Status_Badge](https://img.shields.io/badge/Github-0.2--2-blue.svg)](https://github.com/eblondel/cleangeo)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.822775.svg)](https://doi.org/10.5281/zenodo.822775)
 
