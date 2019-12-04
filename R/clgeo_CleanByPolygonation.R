@@ -79,7 +79,7 @@ clgeo_CleanByPolygonation.Polygon <- function(p, verbose = FALSE){
                           function(i){
                             l.coords <- slot(slot(i,"lines")[[1]],"Lines")[[1]]@coords
                             l.coords<- l.coords[1:(nrow(l.coords)-1),]
-                            if(class(l.coords) != "matrix"){
+                            if(!inherits(l.coords, "matrix")){
                               l.coords <- data.frame(
                                 x = l.coords[1],
                                 y = l.coords[2],
