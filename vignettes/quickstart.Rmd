@@ -7,7 +7,7 @@
 
 The goal of this document is to get you up and running with **cleangeo** as quickly as possible.
 
-**cleangeo** was initially born from some assistance provided to users that were facing issues in processing spatial data in R (see the original post at <http://gis.stackexchange.com/questions/113964/fixing-orphaned-holes-in-r>).
+**cleangeo** was initially born from some assistance provided to users that were facing issues in processing spatial data in R (see the original post at <https://gis.stackexchange.com/questions/113964/fixing-orphaned-holes-in-r>).
 
 The main problem with their data is that some spatial objects did not have valid geometries, exposing different types of geometry errors, preventing any easy spatial data processing with **rgeos**. Then, **cleangeo** was built in order to facilitate handling and catching **rgeos** geometry issues, and provide an utility to _clean_ the spatial objects.
 
