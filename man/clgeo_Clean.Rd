@@ -4,8 +4,7 @@
 \alias{clgeo_Clean}
 \title{clgeo_Clean}
 \usage{
-clgeo_Clean(sp, errors.only = NULL, strategy = "POLYGONATION",
-  verbose = FALSE)
+clgeo_Clean(sp, errors.only = NULL, strategy = "POLYGONATION", verbose = FALSE)
 }
 \arguments{
 \item{sp}{object extending the \code{\link[sp]{Spatial-class}}
