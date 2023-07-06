@@ -20,9 +20,10 @@ warnings or errors (in particular GEOS exceptions).
 }
 \examples{
 \donttest{
- require(maptools)
+ require(sf)
  file <- system.file("extdata", "example.shp", package = "cleangeo")
- sp <- readShapePoly(file)
+ sf <- sf::st_read(file)
+ sp <- as(sf, "Spatial")
  clgeo_IsValid(sp)
 }
 

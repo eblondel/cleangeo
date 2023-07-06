@@ -24,9 +24,10 @@
 #' }
 #' 
 #' @examples
-#'  require(maptools)
+#'  require(sf)
 #'  file <- system.file("extdata", "example.shp", package = "cleangeo")
-#'  sp <- readShapePoly(file)
+#'  sf <- sf::st_read(file)
+#'  sp <- as(sf, "Spatial")
 #'  
 #'  report <- clgeo_CollectionReport(sp)
 #'

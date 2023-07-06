@@ -12,8 +12,7 @@
 #'   \item \emph{type} eventual \pkg{rgeos} issue
 #'   \item \emph{valid} geometry validity status (according to OGC specifications)
 #'   \item \emph{issue_type} type of geometry issue
-#'   \item \emph{error_msg} catched message when error raised about geometry
-#'   \item \emph{warning_msg} catched message when warning raised about geometry
+#'   \item \emph{msg} catched message when error raised about geometry
 #' }  
 #'
 #' @author
@@ -25,11 +24,8 @@
 #'   \item \emph{type} eventual \pkg{rgeos} issue
 #'   \item \emph{valid} geometry validity status (according to OGC specifications)
 #'   \item \emph{issue_type} type of geometry issue
-#'   \item \emph{error_msg} catched message when error raised about geometry
-#'   \item \emph{warning_msg} catched message when warning raised about geometry
+#'   \item \emph{msg} catched message when warning raised about geometry
 #' }
-#'
-#' @seealso \code{\link[rgeos]{gIsValid}}
 #' 
 #' @aliases clgeo_GeometryReport clgeo_Geometry
 #' 
@@ -38,30 +34,22 @@
 #' 
 clgeo_GeometryReport <- function(spgeom){
   
-  clgeo_report <- list(type = NA, valid = FALSE, issue_type = NA,
-                       error_msg = NA, warning_msg = NA)
+  clgeo_report <- list(type = NA, valid = FALSE, issue_type = NA, msg = NA)
   
-  report <- tryCatch({
-    isvalid <- gIsValid(spgeom)
-    if(isvalid) clgeo_report$valid <- TRUE
-    return(clgeo_report)
-    
-  },warning = function(w){
-    clgeo_report$type <- "rgeos_validity"
-    clgeo_report$valid <- FALSE
-    if(regexpr("at or near point", conditionMessage(w), "match.length",
-               ignore.case = TRUE) > 1) clgeo_report$issue_type = "GEOM_VALIDITY"
-    clgeo_report$warning_msg <- conditionMessage(w)
-    return(clgeo_report)
-    
-  },error = function(e){
-    clgeo_report$type <- "rgeos_error"
-    clgeo_report$valid <- FALSE
-    if(regexpr("orphaned hole", conditionMessage(e), "match.length",
-               ignore.case = TRUE) > 1) clgeo_report$issue_type = "ORPHANED_HOLE"
-    clgeo_report$error_msg = conditionMessage(e)
-    return(clgeo_report)
-  })
+  sfgeom = sf::st_as_sf(spgeom)
   
-  return(report)
+  isvalid <- sf::st_is_valid(sfgeom)
+  isvalidreason = sf::st_is_valid(sfgeom, reason = TRUE)
+  if(isvalid){
+    clgeo_report$valid <- TRUE
+  }
+  
+  if(isvalidreason != "Valid Geometry"){
+    clgeo_report$issue_type = "GEOM_VALIDITY"
+    clgeo_report$type <- "geos_error_validity"
+    clgeo_report$valid <- FALSE
+    clgeo_report$msg <- isvalidreason
+  }
+    
+  return(clgeo_report)
 }

@@ -18,9 +18,10 @@
 #'
 #' @examples
 #' \donttest{
-#'  require(maptools)
+#'  require(sf)
 #'  file <- system.file("extdata", "example.shp", package = "cleangeo")
-#'  sp <- readShapePoly(file)
+#'  sf <- sf::st_read(file)
+#'  sp <- as(sf, "Spatial")
 #'  clgeo_IsValid(sp)
 #' }
 #' 
@@ -30,14 +31,12 @@
 #' 
 #'
 clgeo_IsValid <- function(sp, verbose = FALSE){
-  out <- tryCatch({
-    out <- gIsValid(sp)
-  },warning = function(msg){
-    if(verbose) logger.info(sprintf("Catched RGEOS warning '%s'",msg))
-    return(FALSE)
-  },error = function(msg){
-    if(verbose) logger.info(sprintf("Catched RGEOS error '%s'",msg))
-    return(FALSE)
-  })
+  sfgeom = try(sf::st_as_sf(sp), silent = T)
+  if(is(sfgeom, "try-error")) return(FALSE)
+  out <- all(sf::st_is_valid(sfgeom))
+  if(verbose){
+    logger.info("Geometry validity:")
+    print(sf::st_is_valid(sfgeom, reason = TRUE))
+  }
   return(out)
 }

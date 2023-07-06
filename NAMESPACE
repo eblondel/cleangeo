@@ -1,7 +1,6 @@
-importFrom("methods", "as", "slot", "slot<-")
+importFrom("methods", "as", "slot", "slot<-", "is")
 import(sp)
-import(rgeos)
-import(maptools)
+import(sf)
 
 
 export(

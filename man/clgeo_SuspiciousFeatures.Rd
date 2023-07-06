@@ -7,12 +7,13 @@
 clgeo_SuspiciousFeatures(report, errors.only = NULL)
 }
 \arguments{
-\item{report}{a report object as returned by\code{\link{clgeo_CollectionReport}}}
+\item{report}{a report object as returned by\code{\link{clgeo_CollectionReport}}
+for which the output should bounded. Default value is NULL (\emph{i.e.} the output
+will include features for which both errors and errors were raised.).}
 
 \item{errors.only}{an object of class \code{vector} giving the types of errors
 for which the output should bounded. Default value is NULL (\emph{i.e.} the output
-will include features for which both errors and errors were raised.). At now, this
-argument only accepts the error type \code{"ORPHANED_HOLE"}.}
+will include features for which both errors and errors were raised.).}
 }
 \value{
 an object of class \code{vector} giving the numeric indexes of spatial
@@ -25,9 +26,10 @@ collection, given a spatial data collection report returned by  the function
 \code{\link{clgeo_CollectionReport}}
 }
 \examples{
- require(maptools)
+ require(sf)
  file <- system.file("extdata", "example.shp", package = "cleangeo")
- sp <- readShapePoly(file)
+ sf <- sf::st_read(file)
+ sp <- as(sf, "Spatial")
  
  report <- clgeo_CollectionReport(sp)
  nv <- clgeo_SuspiciousFeatures(report)

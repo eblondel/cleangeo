@@ -15,10 +15,9 @@
 #' as defined in \pkg{sp}
 #' @param errors.only an object of class \code{vector} giving the types of errors
 #' for which the output should bounded. Default value is NULL (\emph{i.e.} the output
-#' will include features for which both errors and errors were raised.). At now, this
-#' argument accepts the error type \code{"ORPHANED_HOLE"}.
-#' @param strategy advanced strategy to clean geometries. Default is "POLYGONATION",
-#'        alternate value is "BUFFER" (old method).
+#' will include features for which both errors and errors were raised.).
+#' @param strategy advanced strategy to clean geometries. Default is "SF",
+#'        alternate values are "POLYGONATION, "BUFFER" (old methods).
 #' @param verbose Indicates wether the clean logs have to be printed. Default 
 #' value is FALSE.
 #' @return an object extending the \code{\link[sp]{Spatial-class}}
@@ -26,9 +25,10 @@
 #'
 #' @examples
 #' \donttest{
-#'  require(maptools)
+#'  require(sf)
 #'  file <- system.file("extdata", "example.shp", package = "cleangeo")
-#'  sp <- readShapePoly(file)
+#'  sf <- sf::st_read(file)
+#'  sp <- as(sf, "Spatial")
 #'  
 #'  sp.clean <- clgeo_Clean(sp)
 #'  report.clean <- clgeo_CollectionReport(sp.clean)
@@ -45,14 +45,37 @@
 #' method, triangulation is skipped and a re-polygonation intuitive algorithm is 
 #' applied to rebuild the source invalid geometry into one or more valid polygonal
 #' geometries.
+#' With the progress done on validating geometries, especially with \pkg{sf}, the default
+#' method in cleangeo has now been switched to the use of \code{sf::st_make_valid}
 #' 
 #'
 clgeo_Clean <- function(sp, errors.only = NULL,
-                        strategy = "POLYGONATION",
+                        strategy = "SF",
                         verbose = FALSE){
   
-  if(!(strategy %in% c("POLYGONATION", "BUFFER")))
-    stop("Unknown advanced cleaning method. Accepted values: 'POLYGONATION', 'BUFFER'")
+  if(!(strategy %in% c("SF", "POLYGONATION", "BUFFER")))
+    stop("Unknown advanced cleaning method. Accepted values: 'SF', 'POLYGONATION', 'BUFFER'")
+  
+  if(strategy == "SF"){
+    sf = sf::st_as_sf(sp)
+    sftype = sf::st_geometry_type(sf)
+    fixed.sf = sf::st_make_valid(sf)
+    type <- switch(as(sftype[1], "character"),
+      "MULTIPOLYGON" = "POLYGON",
+      "MULTILINESTRING" = "LINESTRING",
+      "MULTIPOINT" = "POINT",
+      as(sftype,"character")
+    )
+    fixed.sf = do.call("rbind", lapply(1:nrow(fixed.sf), function(i){
+      feat = fixed.sf[i,]
+      if(as(sf::st_geometry_type(feat)[1],"character")=="GEOMETRYCOLLECTION"){
+        feat = sf::st_collection_extract(feat, type = type)
+      }
+      return(feat)
+    }))
+    fixed.sp = as(fixed.sf, "Spatial")
+    return(fixed.sp)
+  }
   
   report <- clgeo_CollectionReport(sp)
   nv <- clgeo_SuspiciousFeatures(report, errors.only)
@@ -95,7 +118,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           slot(polygon, "Polygons") <- newpolygons
         }
         polygon <- SpatialPolygons(Srl = list(polygon))
-        
+        print(polygon)
         #testing validity after removing holes
         isValid <- report[x,]$valid
         if(length(removedHoles) > 0){
@@ -103,13 +126,13 @@ clgeo_Clean <- function(sp, errors.only = NULL,
             logger.info(sprintf("Checking geometry validity at index %s", x))
           }
           
-          tryCatch({
-            slot(polygon, "polygons") <<- lapply(slot(polygon, "polygons"), checkPolygonsHoles)
-          }, warning = function(msg){
-            if(verbose) logger.info(sprintf("Catched MAPTOOLS warning '%s'",msg))
-          }, error = function(err){
-            if(verbose) logger.info(sprintf("Catched MAPTOOLS error '%s'",err))
-          })
+          #tryCatch({
+          #  slot(polygon, "polygons") <<- lapply(slot(polygon, "polygons"), checkPolygonsHoles)
+          #}, warning = function(msg){
+          #  if(verbose) logger.info(sprintf("Catched MAPTOOLS warning '%s'",msg))
+          #}, error = function(err){
+          #  if(verbose) logger.info(sprintf("Catched MAPTOOLS error '%s'",err))
+          #})
           
           isValid <<- clgeo_IsValid(polygon, verbose)
         }
@@ -118,10 +141,8 @@ clgeo_Clean <- function(sp, errors.only = NULL,
         if(is.null(errors.only) & !isValid){
           if(verbose){
             report.msg <- NULL
-            if(!is.na(report[x,"error_msg"])){
-              report.msg <- report[x,"error_msg"]
-            }else if(!is.na(report[x,"warning_msg"])){
-              report.msg <- report[x,"warning_msg"]
+            if(!is.na(report[x,"msg"])){
+              report.msg <- report[x,"msg"]
             }
             logger.info(sprintf("Cleaning geometry at index %s (%s)", x, report.msg))
           }
@@ -132,11 +153,12 @@ clgeo_Clean <- function(sp, errors.only = NULL,
           }else if(strategy == "BUFFER"){
             #try applying buffer attempts
             attempt <- 1
-  		      polygon <- gBuffer(polygon, id = ID, width = 0)
+  		      polygon.sf <- sf::st_buffer(sf::st_as_sf(polygon), dist = 0)
+  		      polygon <- as(polygon.sf, "Spatial")
   		      while(attempt < 3){
   			      if(!clgeo_IsValid(polygon, verbose)){
   				      attempt <- attempt + 1
-        				polygon <- gBuffer(polygon, id = ID, width = 0)
+        				polygon.Sf <- sf::st_buffer(sf::st_as_sf(polygon), dist = 0)
   			      }else{
   				      break;
   			      }
@@ -167,7 +189,7 @@ clgeo_Clean <- function(sp, errors.only = NULL,
       proj4string = CRS(proj4string(sp))
     )
     
-    if(class(sp) == "SpatialPolygonsDataFrame"){
+    if(is(sp, "SpatialPolygonsDataFrame")){
       sp.df <- as(sp, "data.frame")
       ids <- sapply(slot(fixed.sp,"polygons"), slot, "ID")
       if(nrow(sp.df) != length(ids)){

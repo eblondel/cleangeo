@@ -4,7 +4,7 @@
 \alias{clgeo_Clean}
 \title{clgeo_Clean}
 \usage{
-clgeo_Clean(sp, errors.only = NULL, strategy = "POLYGONATION", verbose = FALSE)
+clgeo_Clean(sp, errors.only = NULL, strategy = "SF", verbose = FALSE)
 }
 \arguments{
 \item{sp}{object extending the \code{\link[sp]{Spatial-class}}
@@ -12,11 +12,10 @@ as defined in \pkg{sp}}
 
 \item{errors.only}{an object of class \code{vector} giving the types of errors
 for which the output should bounded. Default value is NULL (\emph{i.e.} the output
-will include features for which both errors and errors were raised.). At now, this
-argument accepts the error type \code{"ORPHANED_HOLE"}.}
+will include features for which both errors and errors were raised.).}
 
-\item{strategy}{advanced strategy to clean geometries. Default is "POLYGONATION",
-alternate value is "BUFFER" (old method).}
+\item{strategy}{advanced strategy to clean geometries. Default is "SF",
+alternate values are "POLYGONATION, "BUFFER" (old methods).}
 
 \item{verbose}{Indicates wether the clean logs have to be printed. Default 
 value is FALSE.}
@@ -35,12 +34,15 @@ geometries and to the classical often used 'buffer' approach. In the polygonatio
 method, triangulation is skipped and a re-polygonation intuitive algorithm is 
 applied to rebuild the source invalid geometry into one or more valid polygonal
 geometries.
+With the progress done on validating geometries, especially with \pkg{sf}, the default
+method in cleangeo has now been switched to the use of \code{sf::st_make_valid}
 }
 \examples{
 \donttest{
- require(maptools)
+ require(sf)
  file <- system.file("extdata", "example.shp", package = "cleangeo")
- sp <- readShapePoly(file)
+ sf <- sf::st_read(file)
+ sp <- as(sf, "Spatial")
  
  sp.clean <- clgeo_Clean(sp)
  report.clean <- clgeo_CollectionReport(sp.clean)

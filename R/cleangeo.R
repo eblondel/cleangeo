@@ -5,6 +5,8 @@
 #' cleaner that will fix all geometry problems, and  eliminate (at least reduce) the likelihood 
 #' of having issues when doing spatial data processing.
 #'
+#' @import sf
+#'
 #' @docType package
 #' @name cleangeo
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}

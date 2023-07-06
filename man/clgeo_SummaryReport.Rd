@@ -13,11 +13,10 @@ clgeo_SummaryReport(report)
 an object of class \code{table} giving the report summary. The summary
 gives the counting by value for each of the report columns:
 \itemize{
-  \item \emph{type} eventual \pkg{rgeos} issue
+  \item \emph{type} eventual geometry issue
   \item \emph{valid} geometry validity status (according to OGC specifications)
   \item \emph{issue_type} type of geometry issue
-  \item \emph{error_msg} catched message when error raised about geometry
-  \item \emph{warning_msg} catched message when warning raised about geometry
+  \item \emph{msg} catched message when error raised about geometry
 }
 }
 \description{
@@ -25,9 +24,10 @@ Function to get summary of a spatial data collection report returned by
 \code{\link{clgeo_CollectionReport}}
 }
 \examples{
- require(maptools)
+ require(sf)
  file <- system.file("extdata", "example.shp", package = "cleangeo")
- sp <- readShapePoly(file)
+ sf <- sf::st_read(file)
+ sp <- as(sf, "Spatial")
  
  report <- clgeo_CollectionReport(sp)
  clgeo_SummaryReport(report)

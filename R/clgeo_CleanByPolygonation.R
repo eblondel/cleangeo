@@ -60,11 +60,14 @@ clgeo_CleanByPolygonation.Polygon <- function(p, verbose = FALSE){
     lapply(1:length(splines),function(i){
       lapply(1:length(splines),function(j){
         if(i != j){
-          if(gCrosses(splines[[i]],splines[[j]])){
-            int <- gIntersection(splines[[i]],splines[[j]])
-            if(class(int) == "SpatialPoints"){
-              enrichLine(i, int@coords)
-              enrichLine(j, int@coords)
+          sfi = sf::st_as_sf(splines[[i]])
+          sfj = sf::st_as_sf(splines[[j]])
+          if(sf::st_crosses(sfi, sfj, sparse = FALSE)){
+            int <- sf::st_intersection(sfi, sfj)
+            intsp <- as(int, "Spatial")
+            if(is(intsp, "SpatialPoints")){
+              enrichLine(i, intsp@coords)
+              enrichLine(j, intsp@coords)
             }
           }
         }
@@ -122,12 +125,13 @@ clgeo_CleanByPolygonation.Polygon <- function(p, verbose = FALSE){
     polygons <- list(Polygon(cc[,1:2],hole=FALSE))
   }
   polygons <- polygons[!sapply(polygons,is.null)]
-  polygons <- polygons[sapply(polygons, function(x){return(slot(x,"area") > (1/rgeos::getScale()))})]
+  polygons <- polygons[sapply(polygons, function(x){return(slot(x,"area") > 1e-08)})] #equiv to rgeos::getScale() in sf?
   
   #manage dangling edges (TODO investigate an easier way)
   if(length(polygons)>0){
     temp.poly <- SpatialPolygons(Srl=list(Polygons(srl=polygons,ID="1")))
-    temp.polygon <- gBuffer(temp.poly, width=0)
+    temp.polygon.sf <- sf::st_buffer(sf::st_as_sf(temp.poly), dist=0)
+    temp.polygon = as(temp.polygon.sf, "Spatial")
     if(is.null(temp.polygon)){
       polygons <- NULL
     }else{
@@ -196,7 +200,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
         poly <- Polygons(srl = po, ID = as.character(ID))
         if(slot(poly, "area") > 0) out <- poly
         if(!is.null(out)){
-          if(slot(poly,"area") >= (1/rgeos::getScale())){
+          if(slot(poly,"area") >= 1e-8){
             ID <<- ID + 1
           }else{
             out <- NULL
@@ -209,7 +213,8 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
   new.polygons <- new.polygons[!sapply(new.polygons,is.null)]
   if(length(new.polygons)==0) return(new.polygons)
   trsp <- SpatialPolygons(Srl = new.polygons)
-  trsp <- gUnionCascaded(trsp, sapply(trsp@polygons, slot, "ID"))
+  trsf = sf::st_as_sf(trsp)
+  trsp <- as(sf::st_union(trsf, by_feature = TRUE), "Spatial")
   trsp <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trsp@polygons, slot, "Polygons")), ID = "1")))
   
   #holes
@@ -248,7 +253,7 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
         polyholes <- Polygons(srl = po, ID = as.character(ID))
         if(slot(polyholes, "area") > 0) out <- polyholes
         if(!is.null(out)){
-          if(slot(polyholes,"area") >= (1/rgeos::getScale())){
+          if(slot(polyholes,"area") >= 1e-8){
             ID <<- ID + 1
           }else{  
             out <- NULL
@@ -260,12 +265,14 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
     new.holes <- new.holes[!sapply(new.holes,is.null)]
     if(length(new.holes)>0){
       trspholes <- SpatialPolygons(Srl = new.holes)
-      trspholes <- gUnionCascaded(trspholes, sapply(trspholes@polygons, slot, "ID"))
+      trsfholes = sf::st_as_sf(trspholes)
+      trspholes <- as(sf::st_union(trsfholes, by_feature = TRUE), "Spatial")
       trspholes <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(trspholes@polygons, slot, "Polygons")), ID = "1")))
-      slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
+      #slot(trspholes, "polygons") <- lapply(slot(trspholes, "polygons"), checkPolygonsHoles)
     
       #difference
-      spout <- gDifference(trsp, trspholes)
+      sfout <- sf::st_difference(sf::st_as_sf(trsp), sf::st_as_sf(trspholes))
+      spout <- as(sfout, "Spatial")
       spout <- SpatialPolygons(Srl = list(Polygons(srl = unlist(lapply(spout@polygons, slot, "Polygons")), ID = "1")))
     }else{
       spout <- trsp
@@ -300,7 +307,12 @@ clgeo_CleanByPolygonation.Polygons <- function(p, verbose = FALSE){
 #' 
 clgeo_CleanByPolygonation.SpatialPolygons <- function(sp, verbose = FALSE){
   spout <- NULL
-  polygons <- unlist(lapply(sp@polygons, clgeo_CleanByPolygonation.Polygons, verbose))
+  polygons <- unlist(lapply(1:length(sp@polygons), function(i){
+    polygons = sp@polygons[[i]]
+    newpolygons = clgeo_CleanByPolygonation.Polygons(polygons, verbose)
+    newpolygons[[1]]@ID <- as.character(i)
+    return(newpolygons)
+  }))
   if(!is.null(polygons)) spout <- SpatialPolygons(Srl = polygons)
   return(spout)
 }
