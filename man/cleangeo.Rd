@@ -3,22 +3,13 @@
 \docType{package}
 \name{cleangeo}
 \alias{cleangeo}
+\alias{cleangeo-package}
 \title{Clean Geometries from Spatial Objects}
 \description{
 cleangeo provides a set of utility tools to inspect spatial objects, facilitate handling and 
 reporting of topology errors and geometry validity issues.  Finally, it provides a geometry 
 cleaner that will fix all geometry problems, and  eliminate (at least reduce) the likelihood 
 of having issues when doing spatial data processing.
-}
-\details{
-\tabular{ll}{
-   Package: \tab cleangeo\cr
-   Type: \tab Package\cr
-   Version: \tab 0.2-4\cr
-   Date: \tab 2021-04-17\cr
-   License: \tab GPL(>=2.0)\cr
-   LazyLoad: \tab yes\cr
- }
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
