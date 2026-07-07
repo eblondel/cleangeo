@@ -194,3 +194,5 @@ test_that("Clean - false polygons",{
   expect_false(sf::st_is_valid(sf::st_as_sf(sp)))
   expect_true(sf::st_is_valid(sf::st_as_sf(sp.clean)))
 })
+
+print(report)
