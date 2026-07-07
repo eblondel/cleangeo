@@ -20,6 +20,7 @@ nv <- NULL
 test_that("clgeo_CollectionReport",{
   
   report <<- clgeo_CollectionReport(sp)
+  print(report)
   expect_is(report, "data.frame")
   expect_equal(nrow(report), 3L)
  
