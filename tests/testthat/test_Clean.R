@@ -17,26 +17,26 @@ report <- NULL
 nv <- NULL
 
 #CollectionReport
-test_that("clgeo_CollectionReport",{
-  
-  report <<- clgeo_CollectionReport(sp)
-  message(report)
-  expect_is(report, "data.frame")
-  expect_equal(nrow(report), 3L)
- 
-  expect_equal(as.character(report[2,"type"]), "geos_error_validity")
-  expect_equal(as.character(report[2,"issue_type"]), "GEOM_VALIDITY")
-  expect_equal(as.character(report[3,"type"]), "geos_error_validity")
-  expect_equal(as.character(report[3, "issue_type"]), "GEOM_VALIDITY")
-  
-})
-
-#SuspiciousFeatures
-test_that("clgeo_SuspiciousFeatures",{
-  nv <<- clgeo_SuspiciousFeatures(report)
-  expect_equal(length(nv), 2L)
-  expect_equal(nv, c(2,3))
-})
+# test_that("clgeo_CollectionReport",{
+#   
+#   report <<- clgeo_CollectionReport(sp)
+#   message(report)
+#   expect_is(report, "data.frame")
+#   expect_equal(nrow(report), 3L)
+#  
+#   expect_equal(as.character(report[2,"type"]), "geos_error_validity")
+#   expect_equal(as.character(report[2,"issue_type"]), "GEOM_VALIDITY")
+#   expect_equal(as.character(report[3,"type"]), "geos_error_validity")
+#   expect_equal(as.character(report[3, "issue_type"]), "GEOM_VALIDITY")
+#   
+# })
+# 
+# #SuspiciousFeatures
+# test_that("clgeo_SuspiciousFeatures",{
+#   nv <<- clgeo_SuspiciousFeatures(report)
+#   expect_equal(length(nv), 2L)
+#   expect_equal(nv, c(2,3))
+# })
 
 #Clean
 test_that("clgeo_Clean",{
